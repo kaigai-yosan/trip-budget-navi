@@ -1,29 +1,16 @@
 // BGM：レイジ系の重低音ビートをブラウザの中で生成して流す（音源ファイルは使わない）
-// 150BPM・Gマイナー。808ベース、キック、クラップ、ロール入りのハイハット、歪ませたシンセ（和音のスタブとアルペジオ）。
-// 右下のボタンで再生・停止、つまみで音量、WAVボタンでこのビートをファイルに保存できる。
+//   A：重低音トラップ（150BPM・Gマイナー）808ベース、ロール入りハイハット、歪ませたシンセのスタブとアルペジオ
+//   B：ダーク・ボーカルチョップ（160BPM・Aマイナー）滑る808、母音のフィルターを通したチョップ風シンセ、パッド、プラック、ライザー
+// 右下のボタンで再生・停止、A/Bの切り替え、つまみで音量、WAVボタンで今のビートをファイルに保存できる。
 (function () {
   "use strict";
-  var BPM = 150, STEP = 60 / BPM / 4, BARS = 8, LOOP = BARS * 16;
-  var ROOTS = [31, 27, 34, 29];                                          // 808の音程：G1, Eb1, Bb1, F1
-  var CHORDS = [[55, 58, 62], [51, 55, 58], [58, 62, 65], [53, 57, 60]]; // Gm, Eb, Bb, F（各2小節）
-  // 1小節＝16ステップ。[0]が奇数小節、[1]が偶数小節のパターン
-  var P = {
-    kick: [[0, 7, 10], [0, 6, 10, 15]],
-    clap: [[8], [8]],
-    ghost: [[15], [13, 14]],
-    open: [[6, 14], [6]],
-    bass: [[[0, 0, 6], [7, 0, 3], [10, 7, 5]], [[0, 0, 6], [6, 0, 2], [10, 12, 3], [13, 7, 3]]], // [ステップ, 半音の差, 長さ(ステップ)]
-    stab: [[[0, 5], [6, 2], [10, 2]], []]                                                      // [ステップ, 長さ(ステップ)]
-  };
-  var HV = [0.55, 0.2, 0.4, 0.2, 0.5, 0.2, 0.4, 0.25, 0.55, 0.2, 0.4, 0.2, 0.5, 0.25, 0.45, 0.3];
-  var ARP = [0, 2, 1, 2, 0, 1, 2, 1];
-
+  var BARS = 8, LOOP = BARS * 16, STEP = 0.1;
   function mtof(n) { return 440 * Math.pow(2, (n - 69) / 12); }
   function curve(k) { var n = 1024, c = new Float32Array(n); for (var i = 0; i < n; i++) { var x = i * 2 / n - 1; c[i] = Math.tanh(k * x) / Math.tanh(k); } return c; }
   function has(arr, v) { return arr.indexOf(v) >= 0; }
 
   // ===== 音の部品 =====
-  function build(ctx, vol) {
+  function build(ctx, vol, satK) {
     var g = { ctx: ctx };
     g.master = ctx.createGain(); g.master.gain.value = vol;
     var comp = ctx.createDynamicsCompressor();
@@ -35,20 +22,20 @@
 
     // 808：歪ませて、小さなスピーカーでも低音の倍音が聞こえるようにする
     g.bass = ctx.createGain(); g.bass.gain.value = 1;
-    var sat = ctx.createWaveShaper(); sat.curve = curve(3.2); sat.oversample = "2x";
+    g.sat = ctx.createWaveShaper(); g.sat.curve = curve(satK); g.sat.oversample = "2x";
     var blp = ctx.createBiquadFilter(); blp.type = "lowpass"; blp.frequency.value = 2400;
-    g.bass.connect(sat); sat.connect(blp); blp.connect(g.master);
+    g.bass.connect(g.sat); g.sat.connect(blp); blp.connect(g.master);
 
     // シンセ：キックのたびに音量を下げ（サイドチェイン風）、ディレイで広げる
     g.synth = ctx.createGain(); g.synth.gain.value = 1;
     g.duck = ctx.createGain(); g.duck.gain.value = 1;
     var dry = ctx.createGain(); dry.gain.value = 0.55;
-    var dl = ctx.createDelay(1); dl.delayTime.value = STEP * 3;
+    g.dl = ctx.createDelay(1); g.dl.delayTime.value = STEP * 3;
     var fb = ctx.createGain(); fb.gain.value = 0.38;
     var dlp = ctx.createBiquadFilter(); dlp.type = "lowpass"; dlp.frequency.value = 3000;
     var wet = ctx.createGain(); wet.gain.value = 0.34;
     g.synth.connect(g.duck); g.duck.connect(dry); dry.connect(g.master);
-    g.duck.connect(dl); dl.connect(dlp); dlp.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(g.master);
+    g.duck.connect(g.dl); g.dl.connect(dlp); dlp.connect(fb); fb.connect(g.dl); g.dl.connect(wet); wet.connect(g.master);
 
     var len = ctx.sampleRate, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
     for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
@@ -101,13 +88,14 @@
     env(a, t, 0.2, 0.005, 1.4);
     n.connect(hp); hp.connect(a); a.connect(g.drums);
   }
-  function bass808(g, t, midi, dur, from) {
-    var c = g.ctx, f = mtof(midi), o = c.createOscillator(), o2 = c.createOscillator(), a = c.createGain(), a2 = c.createGain();
+  // 808：from（MIDIの音程）を指定すると、そこから滑って(glide秒)目的の音程に着く
+  function bass808(g, t, midi, dur, from, glide) {
+    var c = g.ctx, f = mtof(midi), o = c.createOscillator(), o2 = c.createOscillator(), a = c.createGain(), a2 = c.createGain(), gl = glide || 0.07;
     o.type = "sine"; o2.type = "triangle";
     if (from) {
       var f0 = mtof(from);
-      o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.07);
-      o2.frequency.setValueAtTime(f0, t); o2.frequency.exponentialRampToValueAtTime(f, t + 0.07);
+      o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f, t + gl);
+      o2.frequency.setValueAtTime(f0, t); o2.frequency.exponentialRampToValueAtTime(f, t + gl);
     } else {
       o.frequency.setValueAtTime(f * 2.2, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.025);
       o2.frequency.setValueAtTime(f, t);
@@ -130,35 +118,134 @@
     });
     lp.connect(sh); sh.connect(a); a.connect(g.synth);
   }
+  // ボーカルチョップ風：ノコギリ波を、母音の形をした2つのフィルターに通す（アー・オー・イー）
+  var VOW = { a: [800, 1200], o: [500, 900], i: [320, 2400] };
+  function vowel(g, t, midi, dur, v, k) {
+    var c = g.ctx, f = mtof(midi), a = c.createGain(), fm = VOW[k];
+    var f1 = c.createBiquadFilter(), f2 = c.createBiquadFilter(), g1 = c.createGain(), g2 = c.createGain();
+    f1.type = "bandpass"; f1.frequency.value = fm[0]; f1.Q.value = 7;
+    f2.type = "bandpass"; f2.frequency.value = fm[1]; f2.Q.value = 9;
+    g1.gain.value = 1; g2.gain.value = 0.8;
+    [-9, 9].forEach(function (d) {
+      var o = c.createOscillator();
+      o.type = "sawtooth"; o.detune.value = d;
+      o.frequency.setValueAtTime(f * 1.07, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.05); // 音程をしゃくり上げる
+      o.connect(f1); o.connect(f2); o.start(t); o.stop(t + dur + 0.05);
+    });
+    f1.connect(g1); f2.connect(g2); g1.connect(a); g2.connect(a);
+    env(a, t, v * 3.5, 0.008, dur);
+    a.connect(g.synth);
+  }
+  function pad(g, t, midi, dur, v) {
+    var c = g.ctx, f = mtof(midi), lp = c.createBiquadFilter(), a = c.createGain();
+    lp.type = "lowpass"; lp.frequency.value = 1100; lp.Q.value = 1;
+    env(a, t, v, 0.3, dur);
+    [-12, 0, 12].forEach(function (d) {
+      var o = c.createOscillator(), og = c.createGain();
+      o.type = "sawtooth"; o.frequency.value = f; o.detune.value = d; og.gain.value = 0.33;
+      o.connect(og); og.connect(lp); o.start(t); o.stop(t + dur + 0.05);
+    });
+    lp.connect(a); a.connect(g.synth);
+  }
+  function pluck(g, t, midi, dur, v) {
+    var c = g.ctx, f = mtof(midi), o = c.createOscillator(), o2 = c.createOscillator(), a = c.createGain(), lp = c.createBiquadFilter(), og = c.createGain();
+    o.type = "square"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f * 2; og.gain.value = 0.5;
+    lp.type = "lowpass"; lp.frequency.value = 5000;
+    env(a, t, v, 0.002, dur);
+    o.connect(lp); o2.connect(og); og.connect(lp); lp.connect(a); a.connect(g.synth);
+    o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
+  }
+  function riser(g, t) {
+    var c = g.ctx, n = noise(g, t, 1.0), bp = c.createBiquadFilter(), a = c.createGain();
+    bp.type = "bandpass"; bp.Q.value = 2;
+    bp.frequency.setValueAtTime(600, t); bp.frequency.exponentialRampToValueAtTime(9000, t + 0.8);
+    a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.24, t + 0.78); a.gain.linearRampToValueAtTime(0.0001, t + 0.83);
+    n.connect(bp); bp.connect(a); a.connect(g.drums);
+  }
 
-  // ===== 1ステップぶんの演奏 =====
-  function playStep(g, abs, t) {
-    var ls = abs % LOOP, bar = (ls / 16) | 0, s = ls % 16, ci = (bar / 2) | 0, vr = bar % 2, root = ROOTS[ci];
+  // ===== バージョンA：重低音トラップ（150BPM・Gマイナー）=====
+  var A_ROOTS = [31, 27, 34, 29];                                          // 808の音程：G1, Eb1, Bb1, F1
+  var A_CHORDS = [[55, 58, 62], [51, 55, 58], [58, 62, 65], [53, 57, 60]]; // Gm, Eb, Bb, F（各2小節）
+  var A = {
+    kick: [[0, 7, 10], [0, 6, 10, 15]], clap: [[8], [8]], ghost: [[15], [13, 14]], open: [[6, 14], [6]],
+    bass: [[[0, 0, 6], [7, 0, 3], [10, 7, 5]], [[0, 0, 6], [6, 0, 2], [10, 12, 3], [13, 7, 3]]], // [ステップ, 半音の差, 長さ]
+    stab: [[[0, 5], [6, 2], [10, 2]], []]
+  };
+  var A_HV = [0.55, 0.2, 0.4, 0.2, 0.5, 0.2, 0.4, 0.25, 0.55, 0.2, 0.4, 0.2, 0.5, 0.25, 0.45, 0.3];
+  var A_ARP = [0, 2, 1, 2, 0, 1, 2, 1];
+  function playA(g, abs, t) {
+    var ls = abs % LOOP, bar = (ls / 16) | 0, s = ls % 16, ci = (bar / 2) | 0, vr = bar % 2, root = A_ROOTS[ci];
     if (ls === 0) crash(g, t);
-    if (has(P.kick[vr], s)) kick(g, t, 0.95);
-    if (has(P.clap[vr], s)) clap(g, t, 0.8, false);
-    if (has(P.ghost[vr], s)) clap(g, t, 0.22, true);
-    if (has(P.open[vr], s)) hat(g, t, 0.6, true);
-    else if (!(vr === 1 && s === 15)) hat(g, t, HV[s], false);
+    if (has(A.kick[vr], s)) kick(g, t, 0.95);
+    if (has(A.clap[vr], s)) clap(g, t, 0.8, false);
+    if (has(A.ghost[vr], s)) clap(g, t, 0.22, true);
+    if (has(A.open[vr], s)) hat(g, t, 0.6, true);
+    else if (!(vr === 1 && s === 15)) hat(g, t, A_HV[s], false);
     if (vr === 1 && s === 14) hat(g, t + STEP / 2, 0.35, false);
     if (vr === 1 && s === 15) [0, 1 / 3, 2 / 3].forEach(function (k) { hat(g, t + k * STEP, 0.4 + k * 0.3, false); }); // 小節の終わりの3連ロール
-    var list = P.bass[vr];
+    var list = A.bass[vr];
     list.forEach(function (n, i) {
       if (n[0] !== s) return;
       var from = i > 0 && n[1] !== list[i - 1][1] ? root + list[i - 1][1] : 0;
       bass808(g, t, root + n[1], n[2] * STEP, from);
     });
-    P.stab[vr].forEach(function (n) { if (n[0] === s) CHORDS[ci].forEach(function (m) { synth(g, t, m, n[1] * STEP * 1.1, 0.15); }); });
-    if (vr === 1 && s % 2 === 0) synth(g, t, CHORDS[ci][ARP[s / 2] % 3] + 12, STEP * 1.8, 0.2); // 速いアルペジオ
+    A.stab[vr].forEach(function (n) { if (n[0] === s) A_CHORDS[ci].forEach(function (m) { synth(g, t, m, n[1] * STEP * 1.1, 0.15); }); });
+    if (vr === 1 && s % 2 === 0) synth(g, t, A_CHORDS[ci][A_ARP[s / 2] % 3] + 12, STEP * 1.8, 0.2); // 速いアルペジオ
   }
 
+  // ===== バージョンB：ダーク・ボーカルチョップ（160BPM・Aマイナー）=====
+  var B_ROOTS = [33, 29, 31, 28];                                        // 808の音程：A1, F1, G1, E1
+  var B_CHORDS = [[57, 60, 64], [53, 57, 60], [55, 59, 62], [52, 56, 59]]; // Am, F, G, E（各2小節）
+  var B_SCALE = [[0, 3, 5, 7, 10, 12], [0, 2, 4, 7, 9, 12], [0, 2, 4, 7, 9, 12], [0, 2, 4, 7, 9, 12]];
+  var B = {
+    kick: [[0, 3, 6, 10], [0, 3, 7, 10, 13]], clap: [[8], [8, 15]], open: [[6], [14]],
+    bass: [[[0, 0, 5], [5, 0, 2], [7, 12, 3, 0], [11, 0, 4]], [[0, 0, 5], [6, 7, 2], [8, 0, 4], [12, 12, 4, 0]]], // [ステップ, 半音の差, 長さ, 滑り始めの半音の差]
+    chop: [[[2, 0, 2], [4, 2, 1], [7, 3, 2], [10, 2, 1], [12, 0, 2]], [[0, 4, 2], [3, 3, 1], [6, 2, 2], [9, 0, 2], [11, 2, 1], [14, 3, 1]]] // [ステップ, 音階の位置, 長さ]
+  };
+  var B_VOW = ["a", "o", "i"];
+  function playB(g, abs, t) {
+    var ls = abs % LOOP, bar = (ls / 16) | 0, s = ls % 16, ci = (bar / 2) | 0, vr = bar % 2, root = B_ROOTS[ci];
+    if (ls === 0) crash(g, t);
+    if (bar === 7 && s === 8) riser(g, t);
+    if (has(B.kick[vr], s)) kick(g, t, 1);
+    if (has(B.clap[vr], s)) clap(g, t, s === 8 ? 0.85 : 0.25, s !== 8);
+    if (has(B.open[vr], s)) hat(g, t, 0.55, true);
+    else if (s % 2 === 0) hat(g, t, s % 4 === 0 ? 0.6 : 0.4, false);
+    else hat(g, t, 0.18, false);
+    if (vr === 0 && s === 11) hat(g, t + STEP / 2, 0.4, false);
+    if (vr === 0 && s === 14) [0, 1 / 3, 2 / 3].forEach(function (k) { hat(g, t + k * STEP, 0.35 + k * 0.35, false); });
+    if (vr === 1 && s === 12) [0, 0.5].forEach(function (k) { hat(g, t + k * STEP, 0.4, false); });
+    if (vr === 1 && s >= 14) hat(g, t + STEP / 2, 0.5, false); // 小節の終わりで32分に加速
+    B.bass[vr].forEach(function (n) {
+      if (n[0] !== s) return;
+      bass808(g, t, root + n[1], n[2] * STEP * 1.25, n.length > 3 ? root + n[3] : 0, 0.12); // 長く滑る808
+    });
+    if (vr === 0 && s === 0) B_CHORDS[ci].forEach(function (m) { pad(g, t, m, STEP * 30, 0.07); });
+    B.chop[vr].forEach(function (n) {
+      if (n[0] !== s) return;
+      vowel(g, t, root + 36 + B_SCALE[ci][n[1] % 6], n[2] * STEP * 1.15, 0.22, B_VOW[(bar + n[0]) % 3]);
+    });
+    if (s % 4 === 1) pluck(g, t, B_CHORDS[ci][(bar + (s >> 2)) % 3] + 24, STEP * 2.2, 0.1); // きらめく高音
+  }
+
+  var VERS = [
+    { id: "A", name: "A：重低音トラップ", bpm: 150, sat: 3.2, play: playA },
+    { id: "B", name: "B：ダーク・ボーカルチョップ", bpm: 160, sat: 6, play: playB }
+  ];
+
   // ===== 再生 =====
-  var ctx = null, G = null, timer = null, nextT = 0, step = 0, playing = false, want = true, vol = 0.45, armed = false;
+  var ctx = null, G = null, timer = null, nextT = 0, step = 0, playing = false, want = true, vol = 0.45, armed = false, ver = 1;
   function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function setVer(i) {
+    ver = i; STEP = 60 / VERS[i].bpm / 4;
+    if (G && ctx) { G.dl.delayTime.setTargetAtTime(STEP * 3, ctx.currentTime, 0.01); G.sat.curve = curve(VERS[i].sat); }
+  }
+  var v0 = parseInt(load("bgm.ver"), 10);
+  setVer(v0 === 0 || v0 === 1 ? v0 : 1);
   function tick() {
     if (!playing) return;
-    while (nextT < ctx.currentTime + 0.25) { playStep(G, step, nextT); nextT += STEP; step++; }
+    while (nextT < ctx.currentTime + 0.25) { VERS[ver].play(G, step, nextT); nextT += STEP; step++; }
     timer = setTimeout(tick, 40);
   }
   function begin() {
@@ -166,7 +253,8 @@
     playing = true;
     G.master.gain.cancelScheduledValues(ctx.currentTime);
     G.master.gain.setTargetAtTime(vol, ctx.currentTime, 0.02);
-    step = Math.floor((parseInt(load("bgm.step"), 10) || 0) / 16) * 16; // 前のページの続きの小節から始める
+    var saved = (load("bgm.step") || "").split(":"); // 前のページの続きの小節から始める（同じバージョンのときだけ）
+    step = saved[0] === String(ver) ? Math.floor((parseInt(saved[1], 10) || 0) / 16) * 16 : 0;
     nextT = ctx.currentTime + 0.08;
     tick(); ui();
   }
@@ -174,7 +262,7 @@
     if (!ctx) {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
-      ctx = new AC(); G = build(ctx, vol);
+      ctx = new AC(); G = build(ctx, vol, VERS[ver].sat);
     }
     ctx.resume().then(begin, function () { showHint(true); });
   }
@@ -185,6 +273,17 @@
       G.master.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
       setTimeout(function () { if (!playing && ctx) ctx.suspend(); }, 400);
     }
+    ui();
+  }
+  function switchVer() {
+    var next = (ver + 1) % VERS.length;
+    store("bgm.ver", String(next));
+    if (playing && ctx) {
+      playing = false; clearTimeout(timer);
+      G.master.gain.cancelScheduledValues(ctx.currentTime);
+      G.master.gain.setTargetAtTime(0, ctx.currentTime, 0.01); // いったん消して、前のバージョンの残りの音を鳴らさない
+      setTimeout(function () { setVer(next); store("bgm.step", ""); begin(); }, 320);
+    } else setVer(next);
     ui();
   }
 
@@ -198,7 +297,8 @@
     ".bgm.on .bgm-eq i{animation:bgmEq .5s ease-in-out infinite alternate}.bgm.on .bgm-eq i:nth-child(2){animation-delay:-.2s}.bgm.on .bgm-eq i:nth-child(3){animation-delay:-.35s}.bgm.on .bgm-eq i:nth-child(4){animation-delay:-.1s}" +
     "@keyframes bgmEq{from{height:3px}to{height:14px}}" +
     ".bgm-vol{width:84px;accent-color:var(--accent,#2440c9)}" +
-    ".bgm-save{border:1px solid var(--line,#d5dce2)!important;font-size:11px!important;padding:4px 9px!important}.bgm-save:hover{border-color:var(--accent,#2440c9)!important;color:var(--accent,#2440c9)}" +
+    ".bgm-ver,.bgm-save{border:1px solid var(--line,#d5dce2)!important;font-size:11px!important;padding:4px 9px!important}" +
+    ".bgm-ver{font-family:var(--f-mono,monospace)!important;min-width:28px}.bgm-ver:hover,.bgm-save:hover{border-color:var(--accent,#2440c9)!important;color:var(--accent,#2440c9)}" +
     ".bgm button:focus-visible,.bgm input:focus-visible{outline:2px solid var(--accent,#2440c9);outline-offset:2px}" +
     ".bgm-hint{position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap;background:var(--ink,#132230);color:var(--paper,#fff);padding:5px 12px;border-radius:8px;font-weight:500}" +
     "@media (max-width:480px){.bgm-vol{width:56px}}@media (prefers-reduced-motion:reduce){.bgm.on .bgm-eq i{animation:none;height:9px}}@media print{.bgm{display:none}}";
@@ -206,19 +306,23 @@
   var box = document.createElement("div");
   box.className = "bgm";
   box.innerHTML = '<button type="button" class="bgm-btn" aria-pressed="false" aria-label="BGMの再生と停止"><span>BGM</span><span class="bgm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>' +
+    '<button type="button" class="bgm-ver" aria-label="BGMのバージョンを切り替えます"></button>' +
     '<input class="bgm-vol" type="range" min="0" max="100" value="45" aria-label="BGMの音量">' +
     '<button type="button" class="bgm-save" title="このビートをWAVファイルで保存します">WAV</button>' +
     '<span class="bgm-hint" role="status" hidden>タップするとBGMが流れます</span>';
   document.body.appendChild(box);
-  var btn = box.querySelector(".bgm-btn"), range = box.querySelector(".bgm-vol"), save = box.querySelector(".bgm-save"), hint = box.querySelector(".bgm-hint");
+  var btn = box.querySelector(".bgm-btn"), range = box.querySelector(".bgm-vol"), save = box.querySelector(".bgm-save"),
+    hint = box.querySelector(".bgm-hint"), verBtn = box.querySelector(".bgm-ver");
   function showHint(on) { hint.hidden = !on; }
   function ui() {
     box.classList.toggle("on", playing);
     btn.setAttribute("aria-pressed", playing ? "true" : "false");
+    verBtn.textContent = VERS[ver].id;
+    verBtn.title = "いまのBGM：" + VERS[ver].name + "（押すと切り替わります）";
     showHint(!playing && want && !!armed);
   }
-  var v0 = parseFloat(load("bgm.vol"));
-  if (v0 >= 0 && v0 <= 1) vol = v0;
+  var vv = parseFloat(load("bgm.vol"));
+  if (vv >= 0 && vv <= 1) vol = vv;
   range.value = String(Math.round(vol * 100));
   range.addEventListener("input", function () {
     vol = range.value / 100; store("bgm.vol", vol);
@@ -228,7 +332,8 @@
     if (playing) { want = false; store("bgm.on", "0"); stop(); }
     else { want = true; store("bgm.on", "1"); disarm(); start(); }
   });
-  window.addEventListener("pagehide", function () { store("bgm.step", String(step)); });
+  verBtn.addEventListener("click", switchVer);
+  window.addEventListener("pagehide", function () { store("bgm.step", ver + ":" + step); });
 
   // ブラウザは音の自動再生を禁止しているので、最初の操作（タップ・キー入力）でBGMを始める
   function onGesture(e) {
@@ -241,9 +346,11 @@
   function disarm() { armed = false; evs.forEach(function (n) { document.removeEventListener(n, onGesture, true); }); }
 
   // ===== WAV保存（同じビートを書き出す）=====
-  function renderLoop() {
-    var rate = 44100, secs = LOOP * STEP + 1.5, oc = new OfflineAudioContext(2, Math.ceil(rate * secs), rate), g = build(oc, 0.8);
-    for (var i = 0; i < LOOP; i++) playStep(g, i, 0.05 + i * STEP);
+  function renderLoop(i) {
+    var keep = ver; setVer(i);
+    var rate = 44100, secs = LOOP * STEP + 1.5, oc = new OfflineAudioContext(2, Math.ceil(rate * secs), rate), g = build(oc, 0.8, VERS[i].sat);
+    for (var k = 0; k < LOOP; k++) VERS[i].play(g, k, 0.05 + k * STEP);
+    setVer(keep);
     return oc.startRendering();
   }
   function toWav(buf) {
@@ -261,10 +368,11 @@
     return new Blob([out], { type: "audio/wav" });
   }
   save.addEventListener("click", function () {
+    var i = ver;
     save.textContent = "…"; save.disabled = true;
-    renderLoop().then(function (buf) {
+    renderLoop(i).then(function (buf) {
       var a = document.createElement("a");
-      a.href = URL.createObjectURL(toWav(buf)); a.download = "rage-beat-150bpm.wav";
+      a.href = URL.createObjectURL(toWav(buf)); a.download = "rage-beat-" + VERS[i].id + "-" + VERS[i].bpm + "bpm.wav";
       document.body.appendChild(a); a.click();
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
     }).catch(function () {}).then(function () { save.textContent = "WAV"; save.disabled = false; });
@@ -275,10 +383,11 @@
     isPlaying: function () { return playing; },
     wants: function () { return want; },
     hintShown: function () { return !hint.hidden; },
-    analyze: function () {
-      return renderLoop().then(function (buf) {
-        var d = buf.getChannelData(0), n = d.length, peak = 0, sum = 0, low = 0, y = 0, al = 2 * Math.PI * 120 / buf.sampleRate, i;
-        for (i = 0; i < n; i++) { var x = d[i]; if (Math.abs(x) > peak) peak = Math.abs(x); sum += x * x; y += al * (x - y); low += y * y; }
+    version: function () { return VERS[ver].id; },
+    analyze: function (i) {
+      return renderLoop(i == null ? ver : i).then(function (buf) {
+        var d = buf.getChannelData(0), n = d.length, peak = 0, sum = 0, low = 0, y = 0, al = 2 * Math.PI * 120 / buf.sampleRate, k;
+        for (k = 0; k < n; k++) { var x = d[k]; if (Math.abs(x) > peak) peak = Math.abs(x); sum += x * x; y += al * (x - y); low += y * y; }
         return { seconds: n / buf.sampleRate, peak: peak, rms: Math.sqrt(sum / n), lowShare: low / sum, wav: toWav(buf) };
       });
     }
@@ -293,7 +402,7 @@
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (AC) {
-        ctx = new AC(); G = build(ctx, vol);
+        ctx = new AC(); G = build(ctx, vol, VERS[ver].sat);
         setTimeout(function () { if (ctx.state === "running" && want && !playing) { disarm(); begin(); } }, 200);
       }
     } catch (e) {}
