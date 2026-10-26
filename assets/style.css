@@ -48,6 +48,12 @@ header h1 {
   line-height: 1.25; margin: 0; letter-spacing: 0.02em; text-wrap: balance;
 }
 header p { margin: 6px 0 0; color: var(--ink-2); max-width: 60ch; }
+.maplink {
+  display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--accent);
+  padding: 6px 12px; border: 1px solid var(--accent); border-radius: 99px; background: color-mix(in srgb, var(--paper) 80%, transparent);
+  transition: background-color .15s ease, color .15s ease;
+}
+.maplink:hover { background: var(--accent); color: var(--on-accent); }
 .eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; text-decoration: none; }
 a.eyebrow:hover { text-decoration: underline; }
 

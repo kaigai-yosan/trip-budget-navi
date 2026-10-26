@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅の世界地図｜海外旅行予算ナビ</title>
+<meta name="description" content="旅行先で撮った写真を地図に貼って、自分だけの世界地図を作れます。写真はあなたの端末の中だけに保存され、外部には送信されません。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;600;700&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/map.css">
+</head>
+<body class="mappage">
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html">海外旅行予算ナビ</a>
+    <h1>旅の世界地図</h1>
+    <p>旅行先で撮った写真を地図に貼って、自分だけの世界地図を作れます。写真はこの端末のブラウザの中だけに保存され、インターネットには送信されません。</p>
+  </header>
+
+  <section class="stats glass" aria-label="これまでの旅">
+    <div><b id="statCountries">0</b><span>訪れた国・地域</span></div>
+    <div><b id="statPlaces">0</b><span>写真を撮った場所</span></div>
+    <div><b id="statPhotos">0</b><span>写真の枚数</span></div>
+  </section>
+
+  <section class="mapsec glass" aria-label="世界地図">
+    <div class="maptools">
+      <span class="hint" id="pickHint" hidden>地図をクリック（タップ）して、写真を撮った場所を選んでください。</span>
+      <span class="hint" id="zoomHint">ホイールやピンチで拡大、ドラッグで移動できます。ピンを押すとその場所の写真が下に出ます。</span>
+      <div class="toolbtns">
+        <button type="button" id="resetView">全体を表示</button>
+        <button type="button" id="saveImage">地図を画像で保存</button>
+      </div>
+    </div>
+    <div class="mapbox" id="mapBox">
+      <svg id="map" role="img" aria-label="世界地図。写真を撮った場所にピンが立ち、訪れた国に色がつきます"></svg>
+      <p class="maploading" id="mapLoading">地図を読み込んでいます…</p>
+      <div class="maptip" id="mapTip" hidden></div>
+    </div>
+  </section>
+
+  <section class="addsec glass" aria-labelledby="addTitle">
+    <h2 id="addTitle">写真を追加する</h2>
+    <form id="addForm" class="addform" autocomplete="off">
+      <div class="drop" id="drop">
+        <label for="files" class="dropbtn">写真を選ぶ</label>
+        <input type="file" id="files" accept="image/*" multiple>
+        <span class="hint">写真をここにドラッグしてもOK。複数枚を一度に選べます。</span>
+        <div class="queue" id="queue"></div>
+      </div>
+
+      <div class="field">
+        <span class="lbl" id="whereLbl">撮った場所の決め方</span>
+        <div class="seg" role="radiogroup" aria-labelledby="whereLbl">
+          <label><input type="radio" name="where" value="gps" checked><span>位置情報で自動</span></label>
+          <label><input type="radio" name="where" value="city"><span>都市から選ぶ</span></label>
+          <label><input type="radio" name="where" value="map"><span>地図で選ぶ</span></label>
+        </div>
+        <select id="city" aria-label="都市" hidden></select>
+        <div class="hint" id="pickInfo"></div>
+      </div>
+
+      <div class="fields2">
+        <div class="field">
+          <label for="placeName">場所の名前（空欄なら自動）</label>
+          <input type="text" id="placeName" maxlength="40" placeholder="例：サグラダ・ファミリア">
+        </div>
+        <div class="field">
+          <label for="shotDate">撮った日（空欄なら写真から自動）</label>
+          <input type="date" id="shotDate">
+        </div>
+      </div>
+      <div class="field">
+        <label for="memo">ひとこと（任意）</label>
+        <input type="text" id="memo" maxlength="80" placeholder="例：朝イチで行ったら空いていた">
+      </div>
+      <div class="actions">
+        <button type="submit" id="saveBtn" class="primary" disabled>地図に追加する</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+    </form>
+    <p class="note">スマホで撮った写真は、位置情報つきで保存する設定にしておくと自動で場所が決まります。ブラウザによっては、アップロードの時点で位置情報が消されることがあります。その場合は「都市から選ぶ」か「地図で選ぶ」を使ってください。</p>
+  </section>
+
+  <section class="gallerysec glass" id="gallerySec" aria-labelledby="galTitle">
+    <div class="galhead">
+      <h2 id="galTitle">すべての写真</h2>
+      <button type="button" id="showAll" hidden>すべて表示</button>
+    </div>
+    <p class="empty" id="empty">まだ写真がありません。上の「写真を追加する」から、旅の写真を地図に貼ってみましょう。</p>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section class="backup glass" aria-labelledby="bkTitle">
+    <h2 id="bkTitle">バックアップと引っ越し</h2>
+    <p>写真はこのブラウザの中にだけ保存されています。ブラウザのデータを消したり、スマホを買い替えたりすると、写真も消えてしまいます。ときどきバックアップを保存しておくと安心です。別の端末に移すときも、ここで保存したファイルを使います。</p>
+    <div class="actions">
+      <button type="button" id="exportBtn">バックアップを保存</button>
+      <label class="filebtn" for="importFile">バックアップから復元</label>
+      <input type="file" id="importFile" accept="application/json,.json">
+      <span class="status" id="backupStatus" role="status"></span>
+    </div>
+    <p class="hint" id="usage"></p>
+  </section>
+
+  <footer class="glass">
+    <p>写真・場所・ひとこと・撮影日はすべてあなたの端末の中（ブラウザのIndexedDB）に保存され、当サイトのサーバーには送られません。写真は長辺1,600ピクセルに縮小して保存します。地図の国境線は <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener">world-atlas</a>（Natural Earth）のデータを使っています。</p>
+    <nav aria-label="サイト情報">
+      <a href="index.html">トップ（予算を計算する）</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+      <a href="disclaimer.html">免責事項・運営者情報</a>
+      <a href="contact.html">お問い合わせ</a>
+    </nav>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lbTitle" hidden>
+  <div class="lbpanel">
+    <img id="lbImg" alt="">
+    <div class="lbinfo">
+      <h3 id="lbTitle"></h3>
+      <p class="hint" id="lbMeta"></p>
+      <p id="lbMemo"></p>
+      <div class="actions">
+        <button type="button" id="lbDelete" class="danger">削除</button>
+        <button type="button" id="lbClose">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/map.js"></script>
+</body>
+</html>

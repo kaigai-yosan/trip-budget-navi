@@ -1,0 +1,106 @@
+/* 旅の世界地図ページ（予算ナビと同じ色・フォントを使う） */
+body.mappage { background: var(--bg); }
+.mappage .wrap { gap: 22px; }
+.mappage h2 { margin: 0; font-size: 18px; }
+.mappage .glass { padding: 20px; }
+.mappage .hint { font-size: 12px; color: var(--muted); }
+.mappage .field { display: grid; gap: 8px; min-width: 0; }
+.mappage .field > label, .mappage .field > .lbl { font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.04em; }
+.mappage input[type="text"], .mappage input[type="date"], .mappage select {
+  font: inherit; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; min-width: 0;
+}
+.mappage button, .mappage .filebtn {
+  font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 14px; cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, color .15s ease, background-color .15s ease;
+}
+.mappage button:hover, .mappage .filebtn:hover { border-color: var(--accent); color: var(--accent); }
+.mappage button:disabled { opacity: .5; cursor: not-allowed; }
+.mappage button:disabled:hover { border-color: var(--line); color: var(--ink); }
+.mappage button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.mappage button.primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.mappage button.danger { color: var(--warn); }
+.mappage button.danger:hover { border-color: var(--warn); color: var(--warn); }
+.mappage button:focus-visible, .mappage .filebtn:focus-within, .mappage input:focus-visible, .mappage select:focus-visible,
+.mappage .gcard:focus-visible, .mappage .pin:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mappage .filebtn input, .mappage #importFile { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.mappage .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mappage .status { font-size: 13px; color: var(--ink-2); }
+.mappage .status.err { color: var(--warn); font-weight: 700; }
+.mappage .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--paper); }
+
+/* 集計 */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; text-align: center; }
+.stats div { display: grid; gap: 2px; }
+.stats b { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 6vw, 44px); line-height: 1.1; }
+.stats span { font-size: 12px; color: var(--ink-2); }
+
+/* 地図 */
+.maptools { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.maptools .hint { flex: 1 1 260px; }
+.toolbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+.mapbox { position: relative; border-radius: 10px; overflow: hidden; background: var(--accent-soft); line-height: 0; }
+.mapbox svg { width: 100%; height: auto; display: block; touch-action: none; cursor: grab; }
+.mapbox.picking svg { cursor: crosshair; }
+.mapbox.picking { outline: 2px dashed var(--accent); outline-offset: -2px; }
+.sphere { fill: var(--accent-soft); }
+.graticule { fill: none; stroke: var(--paper); stroke-opacity: .5; stroke-width: .4; }
+.country { fill: var(--line); stroke: var(--paper); transition: fill .3s ease; }
+.country.visited { fill: var(--accent); }
+.pin { fill: var(--s2); stroke: var(--paper); cursor: pointer; transition: fill .15s ease; }
+.pin:hover, .pin.active { fill: var(--warn); }
+.pick-mark { fill: none; stroke: var(--warn); stroke-dasharray: 3 2; pointer-events: none; }
+.maploading { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; line-height: 1.6; color: var(--ink-2); font-size: 14px; }
+.maptip {
+  position: absolute; transform: translate(-50%, calc(-100% - 12px)); pointer-events: none; z-index: 2;
+  display: flex; gap: 8px; align-items: center; line-height: 1.4; font-size: 12px;
+  background: var(--ink); color: var(--paper); padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+}
+.maptip img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+
+/* 追加フォーム */
+.addform { display: grid; gap: 18px; margin-top: 14px; }
+.drop { display: grid; gap: 10px; justify-items: start; border: 2px dashed var(--line); border-radius: 12px; padding: 16px; background: var(--paper); transition: border-color .15s ease, background-color .15s ease; }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.dropbtn { display: inline-block; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 14px; cursor: pointer; }
+.dropbtn:hover { background: var(--accent); color: var(--on-accent); }
+.drop input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.drop:focus-within .dropbtn { outline: 2px solid var(--accent); outline-offset: 2px; }
+.queue { display: flex; flex-wrap: wrap; gap: 8px; }
+.qitem { position: relative; width: 84px; }
+.qitem img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; display: block; }
+.qitem span { display: block; font-size: 10px; color: var(--muted); text-align: center; margin-top: 2px; }
+.fields2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 620px) { .fields2 { grid-template-columns: minmax(0, 1fr); } }
+.note { font-size: 12px; color: var(--muted); margin: 14px 0 0; line-height: 1.7; max-width: 80ch; }
+
+/* 写真の一覧 */
+.galhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.empty { color: var(--ink-2); margin: 0; font-size: 14px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+@media (max-width: 520px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+.gcard { display: grid; padding: 0 !important; overflow: hidden; text-align: left; border-radius: 10px !important; font-weight: 500 !important; }
+.gcard img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: var(--accent-soft); }
+.gcard .cap { display: grid; gap: 1px; padding: 8px 10px 10px; }
+.gcard .cap b { font-size: 13px; }
+.gcard .cap small { font-size: 11px; color: var(--muted); font-weight: 500; }
+.gcard:hover { transform: translateY(-2px); }
+
+/* バックアップ */
+.backup p { margin: 8px 0 14px; font-size: 14px; line-height: 1.8; max-width: 80ch; }
+.backup .hint { margin: 10px 0 0; }
+
+/* 写真の拡大 */
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(8, 12, 18, .82); display: grid; place-items: center; padding: 16px; overflow: auto; }
+.lightbox[hidden] { display: none; }
+.lbpanel { background: var(--paper); border-radius: 14px; max-width: min(960px, 100%); width: 100%; overflow: hidden; display: grid; }
+.lbpanel img { width: 100%; max-height: 70vh; object-fit: contain; background: #0b0f14; display: block; }
+.lbinfo { padding: 14px 18px 18px; display: grid; gap: 6px; }
+.lbinfo h3 { margin: 0; font-size: 18px; }
+.lbinfo p { margin: 0; font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mappage button, .mappage .filebtn, .drop, .country { transition: none; }
+  .gcard:hover { transform: none; }
+}
