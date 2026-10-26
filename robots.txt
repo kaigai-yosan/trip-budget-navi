@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://knykdm119-cmyk.github.io/trip-budget-navi/sitemap.xml
+Sitemap: https://kaigai-yosan.github.io/trip-budget-navi/sitemap.xml

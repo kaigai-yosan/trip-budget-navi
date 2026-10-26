@@ -19,15 +19,15 @@
 - [x] スマホでも表示が崩れていないか確認する
 
 ## 2. 公開
-- [x] GitHubのアカウントを作り、サイトのフォルダをアップロードする（リポジトリ：knykdm119-cmyk/trip-budget-navi）
-- [x] GitHub Pages で公開する → https://knykdm119-cmyk.github.io/trip-budget-navi/
+- [x] GitHubのアカウントを作り、サイトのフォルダをアップロードする（リポジトリ：kaigai-yosan/trip-budget-navi）
+- [x] GitHub Pages で公開する → https://kaigai-yosan.github.io/trip-budget-navi/
 - [ ] 独自ドメインを取得して設定する（年1,000〜2,000円ほど。Whois情報公開代行を必ずオンに）
 - [ ] 独自ドメインにしたら `site.json` の `"site"` を書き換え、`build.ps1` を実行して再アップロードする（今はGitHub PagesのURLを設定済み）
 - [x] `https://` で開けることを確認する（GitHub PagesのURLで確認済み）
 
 ## 3. アクセス解析と検索対策
-- [ ] Google Analytics を設定し、タグを `templates/page.html` の `<head>` に貼る
-- [ ] Google Search Console にサイトを登録し、`sitemap.xml` を送信する
+- [x] Google Analytics を設定し、タグを `templates/page.html` の `<head>` に貼る
+- [x] Google Search Console にサイトを登録し、`sitemap.xml` を送信する
 - [ ] 数週間後、都市ページが検索結果に載っているか Search Console で確認する
 
 ## 4. アフィリエイト
