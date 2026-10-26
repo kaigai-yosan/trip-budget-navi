@@ -345,5 +345,12 @@
       ["気候", "夏は白夜で過ごしやすく、冬は日照が5時間ほどで氷点下。オーロラを見るならラップランドへ移動が必要です。"]] }
   };
 
-  window.TRIP = { FROM: FROM, TO: TO, TIPS: TIPS };
+  // 経由地としてだけ選べる都市（乗り継ぎでよく使う空港）。費用の項目は TO と同じ
+  var HUBS = [
+    { id: "doha", name: "ドーハ", code: "DOH", ht: [8000, 18000], fd: [4000, 8000], tr: [1000, 2500], ac: [2000, 5000] },
+    { id: "frankfurt", name: "フランクフルト", code: "FRA", ht: [15000, 26000], fd: [6000, 10000], tr: [1000, 2000], ac: [2000, 5000] },
+    { id: "beijing", name: "北京", code: "PEK", ht: [6000, 13000], fd: [3000, 5500], tr: [800, 1500], ac: [2000, 4000] }
+  ];
+
+  window.TRIP = { FROM: FROM, TO: TO, TIPS: TIPS, HUBS: HUBS };
 })();

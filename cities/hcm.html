@@ -84,6 +84,19 @@
         <span class="lbl">航空会社のオプション（1人往復）</span>
         <div class="opts" id="opts"></div>
       </div>
+      <div class="field">
+        <label for="hub">経由地（乗り継ぎ・立ち寄り）</label>
+        <select id="hub"></select>
+        <div class="stop-detail" id="stopDetail" hidden>
+          <div class="stop-row">
+            <select id="stopDir" aria-label="経由するのは行きか帰りか"><option value="out">行き</option><option value="back">帰り</option></select>
+            <input type="number" id="stopLen" min="1" max="23" value="5" inputmode="numeric" aria-label="経由地での時間または日数">
+            <select id="stopUnit" aria-label="時間か日数か"><option value="h">時間の乗り継ぎ</option><option value="d">泊の立ち寄り</option></select>
+          </div>
+          <label class="opt" id="goOutRow"><input type="checkbox" id="goOut">空港の外に出て市内を観光する</label>
+        </div>
+        <div class="hint" id="hubHint">乗り継ぎの待ち時間や、経由地に泊まる日数を予算に入れられます。</div>
+      </div>
       <div class="sky">
         <a class="sky-link" id="skyLink" href="#" target="_blank" rel="noopener">Skyscannerで実際の料金を見る <span class="pr" id="skyPr" hidden>PR</span> ↗</a>
         <label for="override" class="hint">比較サイトで見つけた料金（1人あたり往復・円）を入力すると、その金額で計算します</label>
@@ -99,6 +112,7 @@
         <div class="route">
           <div class="ap"><b id="fromCode">HND</b><small id="fromName">関東</small></div>
           <svg class="plane" id="planeSvg" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12H60" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3" fill="none"/><g class="plane-icon"><path d="M16 7c0-1-1-1-2-1H9L6 0H4l2 6H2L1 4H0l.5 3L0 10h1l1-2h4l-2 6h2l3-6h5c1 0 2 0 2-1z" fill="currentColor"/></g></svg>
+          <div class="via" id="viaBox" hidden><small>経由</small><b id="viaCode"></b><small id="viaLen"></small></div>
           <div class="ap"><b id="toCode">—</b><small id="toName"></small></div>
         </div>
         <div class="meta" id="chips"></div>

@@ -10,7 +10,7 @@
   --accent-soft: #e3e8fb;
   --on-accent: #ffffff;
   --warn: #9a5b00;
-  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6;
   --f-display: "Dela Gothic One", "Hiragino Kaku Gothic StdN", "Yu Gothic", sans-serif;
   --f-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
   --f-mono: "Azeret Mono", ui-monospace, "Consolas", monospace;
@@ -20,14 +20,14 @@
   :root:not([data-theme="light"]) {
     --bg: #0e151c; --paper: #16202a; --ink: #e8eef3; --ink-2: #aebbc7; --muted: #8592a0;
     --line: #2a3743; --accent: #7d93ff; --accent-soft: #1f2a4d; --on-accent: #0e151c; --warn: #f0b44c;
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e151c; --paper: #16202a; --ink: #e8eef3; --ink-2: #aebbc7; --muted: #8592a0;
   --line: #2a3743; --accent: #7d93ff; --accent-soft: #1f2a4d; --on-accent: #0e151c; --warn: #f0b44c;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -257,6 +257,16 @@ footer nav a:hover { text-decoration: underline; }
 .doc p, .doc li { line-height: 1.85; }
 .doc a { color: var(--accent); }
 .doc .meta-line { font-size: 13px; color: var(--muted); }
+
+/* 経由地（乗り継ぎ・途中降機） */
+.stop-detail { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--paper); }
+.stop-row { display: grid; grid-template-columns: 76px 72px minmax(0, 1fr); gap: 6px; }
+.stop-row select, .stop-row input { padding: 8px 8px; font-size: 14px; }
+.stop-row input { font-family: var(--f-mono); text-align: center; }
+.via { display: grid; justify-items: center; gap: 2px; padding: 4px 10px; border: 1px dashed var(--accent); border-radius: 8px; }
+.via b { font-family: var(--f-mono); font-size: 18px; font-weight: 700; line-height: 1; color: var(--accent); }
+.via small { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.route { flex-wrap: wrap; }
 
 /* 入国情報カード（施行日つき） */
 .tipc.entry { grid-column: 1 / -1; gap: 10px; }

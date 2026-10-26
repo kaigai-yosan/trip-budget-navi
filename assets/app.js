@@ -1,6 +1,6 @@
 // 予算の計算と画面の更新
 (function () {
-  var D = window.TRIP, FROM = D.FROM, TO = D.TO, TIPS = D.TIPS;
+  var D = window.TRIP, FROM = D.FROM, TO = D.TO, TIPS = D.TIPS, HUBS = D.HUBS || [];
   var AFF = window.TRIP_AFFILIATES || [];
   var SC = window.TRIP_SCENES;
   var ENTRY = window.TRIP_ENTRY || { checked: "", rules: {}, pending: {} };
@@ -18,6 +18,10 @@
     { id: "meal", n: "機内食", p: [2000, 4000] }
   ];
   var PE_MULT = 1.8;
+  // 経由地：乗り継ぎでよく使う都市（選択肢の上にまとめる）と、空港から出なくても渡航認証が必要な国
+  var HUB_POPULAR = ["doha", "dubai", "istanbul", "helsinki", "frankfurt", "amsterdam", "london", "paris", "seoul", "taipei", "hongkong",
+    "beijing", "shanghai", "singapore", "bangkok", "kualalumpur", "hanoi", "hcm", "la", "sanfrancisco", "vancouver", "honolulu"];
+  var TRANSIT_FEE = { honolulu: 1, newyork: 1, la: 1, sanfrancisco: 1, lasvegas: 1, vancouver: 1 };
   var MODE = {
     student: { name: "大学生の節約旅", i: 0, hint: "LCCや乗継便、ドミトリー（相部屋）、ローカル食堂、ISIC国際学生証などの学割を前提にした予算です。" },
     standard: { name: "標準", i: 1, hint: "直行便のエコノミー、3つ星クラスのホテル（2名1室）、レストランも適度に使う予算です。" }
@@ -89,7 +93,19 @@
       else if (lead >= 14 && lead < 30) { lf = 1.15; factors.push({ n: "出発まで1か月未満", v: "×1.15", dir: "up" }); }
       else if (lead >= 45 && lead <= 150) { lf = 0.95; factors.push({ n: "45日以上前の予約", v: "×0.95", dir: "down" }); }
     }
-    var pe = a.t !== "lcc" && p.opts.pe;
+    // 経由地を指定したのに直行便を選んでいる場合は、いちばん安い乗継便の料金で計算する
+    var a2 = a, viaMult = 1;
+    if (p.stop && a.t !== "via" && !p.override) {
+      var vias = t.air.filter(function (x) { return x.t === "via"; });
+      if (vias.length) {
+        a2 = vias.reduce(function (best, x) { return x.m < best.m ? x : best; });
+        factors[0] = { n: "経由地あり：" + a2.n.replace(/（.*?）/g, "") + "（乗継便）", v: "×" + a2.m, dir: a2.m < 1 ? "down" : "" };
+      } else {
+        viaMult = 1.08;
+        factors.push({ n: "経由便の加算", v: "×1.08", dir: "up" });
+      }
+    }
+    var pe = a2.t !== "lcc" && p.opts.pe;
     if (pe) factors.push({ n: "プレミアムエコノミー", v: "×" + PE_MULT, dir: "up" });
 
     var add = f.add[long], fare1;
@@ -97,14 +113,21 @@
       fare1 = p.override;
       factors = [{ n: "Skyscannerなどで見た料金を使用", v: yen(p.override), dir: "" }];
     } else {
-      fare1 = round(t.base * a.m * se.fl * wk * lf * (pe ? PE_MULT : 1) + add, 1000);
+      fare1 = round(t.base * a2.m * se.fl * wk * lf * viaMult * (pe ? PE_MULT : 1) + add, 1000);
       if (add) factors.push({ n: f.name + "発の加算", v: "+" + yen(add), dir: "up" });
     }
     var opt1 = 0, optNames = [];
-    if (a.t === "lcc") LCC_OPTS.forEach(function (o) { if (p.opts[o.id]) { opt1 += o.p[long]; optNames.push(o.n.replace(/（.*?）/, "")); } });
-    var flight1 = fare1 + opt1;
+    if (a2.t === "lcc") LCC_OPTS.forEach(function (o) { if (p.opts[o.id]) { opt1 += o.p[long]; optNames.push(o.n.replace(/（.*?）/, "")); } });
+    // 経由地に泊まる（途中降機）場合は、周遊の航空券になるぶんを上乗せ
+    var stopPrem = 0;
+    if (p.stop && p.stop.unit === "d") {
+      stopPrem = Math.max(5000, round(fare1 * 0.05, 1000));
+      factors.push({ n: "途中降機（立ち寄り）の追加料金", v: "+" + yen(stopPrem), dir: "up" });
+    }
+    var flight1 = fare1 + opt1 + stopPrem;
 
-    var nights = days - 1 - (t.night || 0), localDays = nights + 1, rooms = Math.ceil(people / 2);
+    var stopN = p.stop && p.stop.unit === "d" ? p.stop.len : 0;
+    var nights = days - 1 - (t.night || 0) - stopN, localDays = nights + 1, rooms = Math.ceil(people / 2);
     var hotel, hotelCalc;
     if (modeKey === "student") {
       var bed = round(Math.max(1500, t.ht[0] * 0.35) * se.ht, 100);
@@ -124,9 +147,46 @@
     var en = entryFor(t.id, fmtDate(p.dep || today()));
     var fee1 = en.expired || !en.rule ? 0 : en.rule.fee || 0;
 
+    // 経由地での滞在費
+    var stopItem = null, hen = null;
+    if (p.stop) {
+      var sx = p.stop, hb = sx.hub, parts = [], pp = 0, hotelS = 0, hotelDesc = "";
+      hen = entryFor(hb.id, fmtDate(p.dep || today()));
+      var hFood = modeKey === "student" ? round(hb.fd[0] * 0.85, 100) : hb.fd[1];
+      var hAc = modeKey === "student" ? round(hb.ac[0] * 0.8, 100) : hb.ac[1];
+      var hubHotel = function (n) {
+        if (modeKey === "student") {
+          var b = round(Math.max(1500, hb.ht[0] * 0.35) * se.ht, 100);
+          hotelDesc = "ドミトリー " + yen(b) + " × " + n + "泊 × " + people + "名";
+          return b * n * people;
+        }
+        var rm = round(hb.ht[1] * se.ht, 500);
+        hotelDesc = "ホテル1室 " + yen(rm) + " × " + n + "泊 × " + rooms + "室";
+        return rm * n * rooms;
+      };
+      if (sx.unit === "h") {
+        var meals = Math.max(1, Math.ceil(sx.len / 6)), meal = round(hFood / 3 * 1.4, 100);
+        pp += meals * meal; parts.push("空港での食事 " + yen(meal) + "×" + meals + "回");
+        if (sx.goOut) { var go = hb.tr[s] + round(hAc * 0.5, 100); pp += go; parts.push("市内への往復と観光 " + yen(go)); }
+        if (sx.len >= 10) hotelS = hubHotel(1);
+      } else {
+        var day1 = hFood + hb.tr[s] + hAc;
+        pp += day1 * sx.len; parts.push("食費・交通・観光 " + yen(day1) + "×" + sx.len + "日");
+        hotelS = hubHotel(sx.len);
+      }
+      var hr = hen.rule;
+      var needEntry = sx.unit === "d" || sx.goOut || TRANSIT_FEE[hb.id];
+      if (needEntry && hr && !hen.expired && hr.fee && !(fee1 && en.rule && hr.feeName === en.rule.feeName)) {
+        pp += hr.fee; parts.push(hr.feeName + " " + yen(hr.fee));
+      }
+      stopItem = { k: "経由地での滞在", c: "--s7", v: pp * people + hotelS,
+        calc: hb.name + "：" + parts.join("・") + "（1人）" + (hotelS ? " ＋ " + hotelDesc : "") };
+    }
+
     var items = [
       { k: "航空券", c: "--s1", v: flight1 * people,
-        calc: "運賃 " + yen(fare1) + (opt1 ? " ＋ " + optNames.join("・") + " " + yen(opt1) : "") + " × " + people + "名（往復）" },
+        calc: "運賃 " + yen(fare1) + (opt1 ? " ＋ " + optNames.join("・") + " " + yen(opt1) : "") +
+          (stopPrem ? " ＋ 途中降機 " + yen(stopPrem) : "") + " × " + people + "名（往復）" },
       { k: "宿泊", c: "--s2", v: hotel, calc: hotelCalc },
       { k: "食費", c: "--s3", v: food1 * localDays * people, calc: yen(food1) + " × " + localDays + "日 × " + people + "名" },
       { k: "現地交通", c: "--s4", v: tr1 * localDays * people, calc: yen(tr1) + " × " + localDays + "日 × " + people + "名（空港アクセス含む）" },
@@ -135,8 +195,10 @@
       { k: "保険・通信・雑費", c: "--s6", v: (insurance1 + data1 + misc1 + fee1) * people,
         calc: "保険 " + yen(insurance1) + "・eSIM " + yen(data1) + "・お土産等 " + yen(misc1) + (fee1 ? "・" + en.rule.feeName + " " + yen(fee1) : "") + "（1人）" }
     ];
+    if (stopItem) items.push(stopItem);
     var total = items.reduce(function (x, y) { return x + y.v; }, 0);
-    return { items: items, total: total, flight1: flight1, factors: factors, se: se, nights: nights, a: a, entry: en };
+    return { items: items, total: total, flight1: flight1, factors: factors, se: se, nights: nights, a: a2, entry: en,
+      hubEntry: hen, viaSwitched: a2 !== a };
   }
 
   // ===== 入国情報：旅行日に有効なルールを選ぶ =====
@@ -194,6 +256,28 @@
     if (t.id === (pageCity || "taipei")) o.selected = true;
     groups[t.g].appendChild(o);
   });
+  // 経由地の選択肢
+  var HUB_ALL = TO.concat(HUBS);
+  function findHub(id) { return HUB_ALL.find(function (x) { return x.id === id; }); }
+  (function () {
+    var sel = $("hub");
+    sel.appendChild(new Option("なし（直行便・乗り継ぎを入れない）", ""));
+    var g1 = document.createElement("optgroup"), g2 = document.createElement("optgroup");
+    g1.label = "乗り継ぎでよく使う都市"; g2.label = "その他の都市";
+    HUB_POPULAR.forEach(function (id) { var h = findHub(id); if (h) g1.appendChild(new Option(h.name + "（" + h.code + "）", h.id)); });
+    TO.forEach(function (h) { if (HUB_POPULAR.indexOf(h.id) < 0) g2.appendChild(new Option(h.name + "（" + h.code + "）", h.id)); });
+    sel.appendChild(g1); sel.appendChild(g2);
+  })();
+  function updateStopUI() {
+    var on = !!$("hub").value, unit = $("stopUnit").value;
+    $("stopDetail").hidden = !on;
+    $("goOutRow").hidden = unit !== "h";
+    $("stopLen").max = unit === "h" ? 23 : 10;
+    $("hubHint").textContent = !on ? "乗り継ぎの待ち時間や、経由地に泊まる日数を予算に入れられます。"
+      : unit === "h" ? "空港での食事代を入れます。10時間以上はホテル1泊分、空港の外に出る場合は市内への交通費・観光費と入国の手続き費用も加えます。"
+      : "経由地に泊まります。旅行の日数は変えずに、その分だけ目的地での滞在が短くなります。航空券には途中降機の追加料金を加えます。";
+  }
+
   var d0 = new Date(today().getTime() + 45 * DAY);
   $("dep").value = fmtDate(d0);
   $("ret").value = fmtDate(new Date(d0.getTime() + 4 * DAY));
@@ -250,13 +334,31 @@
     days = Math.max(minD, Math.min(60, days));
     if (!dep) dep = today();
 
+    // 経由地
+    var stop = null, hubId = $("hub").value;
+    if (hubId) {
+      var hb = findHub(hubId), unit = $("stopUnit").value, len = parseInt($("stopLen").value, 10) || 1;
+      if (hb.id === t.id) err = err || "経由地と旅行先が同じです。別の経由地を選んでください。";
+      else {
+        if (unit === "h") len = Math.max(1, Math.min(23, len));
+        else {
+          // 旅行先に1泊以上残す
+          var maxStay = Math.min(10, days - 2 - (t.night || 0));
+          if (maxStay < 1) { err = err || "日程が短いため、経由地に泊まる日数を取れません。"; len = 0; }
+          else if (len > maxStay) { err = err || "経由地に泊まれるのは最大" + maxStay + "泊です（旅行先に1泊以上残すため）。"; len = maxStay; }
+          len = Math.max(0, len);
+        }
+        if (len > 0) stop = { hub: hb, unit: unit, len: len, dir: $("stopDir").value, goOut: unit === "h" && $("goOut").checked };
+      }
+    }
+
     var override = parseFloat($("override").value);
     var e = estimate({
       f: f, t: t, mode: modeKey, ai: +$("airline").value, people: people, days: days, dep: dep, ret: ret,
       opts: { bag: checked("bag"), seat: checked("seat"), meal: checked("meal"), pe: checked("pe") },
-      override: override > 0 ? override : 0
+      override: override > 0 ? override : 0, stop: stop
     });
-    e.f = f; e.t = t; e.modeKey = modeKey; e.mode = MODE[modeKey]; e.people = people;
+    e.f = f; e.t = t; e.modeKey = modeKey; e.mode = MODE[modeKey]; e.people = people; e.stop = stop;
     e.dep = dep; e.ret = ret; e.days = days; e.err = err; e.override = override > 0;
     return e;
   }
@@ -386,14 +488,20 @@
     $("dateErr").hidden = !r.err;
     $("dateErr").textContent = r.err;
     $("daysOut").textContent = r.days + "日間";
-    $("nightsHint").textContent = "現地" + r.nights + "泊" + (r.t.night ? "＋機内" + r.t.night + "泊" : "");
+    $("nightsHint").textContent = r.t.name + r.nights + "泊" +
+      (r.stop && r.stop.unit === "d" ? "＋" + r.stop.hub.name + r.stop.len + "泊" : "") + (r.t.night ? "＋機内" + r.t.night + "泊" : "");
     $("modeHint").textContent = r.mode.hint;
 
     flipTo($("fromCode"), r.f.code);
     $("fromName").textContent = r.f.name;
     flipTo($("toCode"), r.t.code);
     $("toName").textContent = r.t.name;
-    $("chips").innerHTML = [r.mode.name, r.days + "日間", r.people + "名", r.se.n]
+    $("viaBox").hidden = !r.stop;
+    if (r.stop) {
+      $("viaCode").textContent = r.stop.hub.code;
+      $("viaLen").textContent = (r.stop.dir === "out" ? "行き・" : "帰り・") + r.stop.len + (r.stop.unit === "h" ? "時間" : "泊");
+    }
+    $("chips").innerHTML = [r.mode.name, r.days + "日間", r.people + "名", r.se.n].concat(r.stop ? ["経由 " + r.stop.hub.name] : [])
       .map(function (c) { return '<span class="chip">' + c + "</span>"; }).join("");
     $("flightline").innerHTML = "<span>往路 <b>" + md(r.dep) + "</b></span>" +
       (r.ret ? "<span>復路 <b>" + md(r.ret) + "</b></span>" : "") + "<span>" + esc(r.a.n) + "</span>";
@@ -433,6 +541,16 @@
     if (r.t.night) notes.push("往路か復路が夜行便になるため、" + r.days + "日間のうち1泊は機内泊として宿泊費から除いています。");
     if (r.modeKey === "student") notes.push("学割はISIC国際学生証（発行手数料は別途）や学生証の提示で使える美術館・観光施設の割引を想定しています。");
     else notes.push("宿泊は2名で1室として計算しています。");
+    if (r.stop) {
+      var sx = r.stop, hn = sx.hub.name, dirTxt = sx.dir === "out" ? "行き" : "帰り";
+      if (sx.unit === "h") notes.push(hn + "での" + sx.len + "時間の乗り継ぎ（" + dirTxt + "）を入れています。" + (sx.len >= 10 ? "10時間以上なので空港近くのホテル1泊分も含めています。" : ""));
+      else notes.push(hn + "に" + sx.len + "泊立ち寄ります（" + dirTxt + "）。そのぶん" + r.t.name + "での滞在は" + r.nights + "泊になります。");
+      if (r.viaSwitched) notes.push("経由地を指定したため、航空券は乗継便の料金で計算しています。");
+      if (TRANSIT_FEE[sx.hub.id]) notes.push("アメリカ・カナダは、空港から出ない乗り継ぎでもESTA・eTAが必要です。");
+      if ((sx.unit === "d" || sx.goOut) && r.hubEntry && r.hubEntry.rule) {
+        notes.push(hn + "の入国条件：" + (r.hubEntry.expired ? (r.hubEntry.rule.after || "最新の入国条件を確認してください。") : r.hubEntry.rule.text));
+      }
+    }
     if (r.entry.expired) notes.unshift("入国：" + (r.entry.rule.after || "この日程は入国措置の期限を過ぎています。") + "この費用は予算に含めていません。");
     notes.push("クレジットカード付帯の海外旅行保険を使えば、保険料はかからない場合があります。");
     $("notes").innerHTML = notes.map(function (n) { return "<li>" + n + "</li>"; }).join("");
@@ -468,6 +586,8 @@
     var id = e.target.id;
     if (e.target.name === "mode" || id === "to") { $("override").value = ""; fillAirlines(); }
     else if (id === "airline") fillOpts();
+    else if (id === "stopUnit") { $("stopLen").value = e.target.value === "h" ? 5 : 1; updateStopUI(); }
+    else if (id === "hub") updateStopUI();
     else if (id === "dep") {
       // 出発日を動かしたら日数を保って帰国日もずらす
       var dep = parseDate(e.target.value), prev = parseDate(e.target.dataset.prev || ""), ret = parseDate($("ret").value);
@@ -476,7 +596,7 @@
     }
     render();
   });
-  $("form").addEventListener("input", function (e) { if (e.target.id === "override") render(); });
+  $("form").addEventListener("input", function (e) { if (e.target.id === "override" || e.target.id === "stopLen") render(); });
   $("form").addEventListener("submit", function (e) { e.preventDefault(); });
   $("minus").addEventListener("click", function () { shiftReturn(-1); });
   $("plus").addEventListener("click", function () { shiftReturn(1); });
@@ -484,6 +604,7 @@
 
   $("dep").dataset.prev = $("dep").value;
   fillAirlines();
+  updateStopUI();
   renderCompare();
   render();
 })();
