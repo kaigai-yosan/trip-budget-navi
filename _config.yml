@@ -1,0 +1,7 @@
+# GitHub Pages の設定：サイトとして公開しないファイル
+exclude:
+  - README.md
+  - CHECKLIST.md
+  - build.ps1
+  - site.json
+  - templates/

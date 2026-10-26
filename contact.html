@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>お問い合わせ｜海外旅行予算ナビ</title>
+<meta name="description" content="海外旅行予算ナビへのお問い合わせはこちらのフォームからどうぞ。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .form-frame { width: 100%; height: 1100px; border: 1px solid var(--line); border-radius: 10px; background: #ffffff; display: block; }
+  .form-pending { border: 1px dashed var(--line); border-radius: 10px; padding: 20px; color: var(--ink-2); }
+  .topics { margin: 0; padding-left: 1.2em; }
+</style>
+</head>
+<body>
+<main class="doc">
+  <a class="eyebrow" href="index.html">海外旅行予算ナビ</a>
+  <h1>お問い合わせ</h1>
+
+  <p>サイトへのご意見やご質問は、下のフォームからお送りください。たとえば次のような内容を受け付けています。</p>
+  <ul class="topics">
+    <li>表示がおかしい、計算が動かないなどの不具合</li>
+    <li>料金の目安や旅行先の情報の誤り</li>
+    <li>掲載・提携に関するご相談</li>
+  </ul>
+  <p>返信が必要な場合は、フォームに返信先のメールアドレスをご記入ください。返信まで数日いただくことがあります。いただいた情報の取り扱いは<a href="privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+
+  <div id="formArea">
+    <p class="form-pending" id="formPending">お問い合わせフォームは準備中です。</p>
+  </div>
+  <p class="meta-line" id="formFallback" hidden>フォームが表示されない場合は <a id="formLink" href="#" target="_blank" rel="noopener">こちらから新しいタブで開いてください</a>。</p>
+
+  <p><a href="index.html">← トップに戻る</a></p>
+</main>
+<script>
+  // ===== 設定 =====
+  // Googleフォームの「送信」→「<>（埋め込む）」で表示されるURL（src="..." の中身）を貼り付ける
+  // 例："https://docs.google.com/forms/d/e/XXXXXXXX/viewform?embedded=true"
+  var GOOGLE_FORM_URL = "";
+
+  (function () {
+    if (!GOOGLE_FORM_URL) return;
+    var url = GOOGLE_FORM_URL.indexOf("embedded=true") >= 0 ? GOOGLE_FORM_URL
+      : GOOGLE_FORM_URL + (GOOGLE_FORM_URL.indexOf("?") >= 0 ? "&" : "?") + "embedded=true";
+    var frame = document.createElement("iframe");
+    frame.className = "form-frame";
+    frame.src = url;
+    frame.title = "お問い合わせフォーム";
+    frame.loading = "lazy";
+    var area = document.getElementById("formArea");
+    area.innerHTML = "";
+    area.appendChild(frame);
+    document.getElementById("formLink").href = url.replace("embedded=true", "");
+    document.getElementById("formFallback").hidden = false;
+  })();
+</script>
+</body>
+</html>
