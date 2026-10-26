@@ -19,11 +19,11 @@
 - [ ] スマホでも表示が崩れていないか確認する
 
 ## 2. 公開
-- [ ] GitHubのアカウントを作り、サイトのフォルダをアップロードする
-- [ ] GitHub Pages か Cloudflare Pages で公開する
-- [ ] 独自ドメインを取得して設定する（年1,000〜2,000円ほど）
-- [ ] `site.json` の `"site"` を自分のURLに書き換え、`build.ps1` を実行して再アップロードする
-- [ ] `https://` で開けることを確認する
+- [x] GitHubのアカウントを作り、サイトのフォルダをアップロードする（リポジトリ：knykdm119-cmyk/trip-budget-navi）
+- [x] GitHub Pages で公開する → https://knykdm119-cmyk.github.io/trip-budget-navi/
+- [ ] 独自ドメインを取得して設定する（年1,000〜2,000円ほど。Whois情報公開代行を必ずオンに）
+- [ ] 独自ドメインにしたら `site.json` の `"site"` を書き換え、`build.ps1` を実行して再アップロードする（今はGitHub PagesのURLを設定済み）
+- [x] `https://` で開けることを確認する（GitHub PagesのURLで確認済み）
 
 ## 3. アクセス解析と検索対策
 - [ ] Google Analytics を設定し、タグを `templates/page.html` の `<head>` に貼る
