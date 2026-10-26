@@ -239,7 +239,7 @@
   // 行き先を探すページ（find.html）からも同じ計算を使えるように公開する
   window.TRIP_CALC = {
     estimate: estimate, MODE: MODE, TYPE: TYPE, defaultAirline: defaultAirline, defaultLccOpts: defaultLccOpts,
-    findTo: findTo, findFrom: findFrom, yen: yen, man: man, DAY: DAY
+    findTo: findTo, findFrom: findFrom, yen: yen, man: man, DAY: DAY, entryFor: entryFor
   };
   if (!document.getElementById("form")) return; // 見積もりの入力欄がないページ（find.htmlなど）はここまで
 

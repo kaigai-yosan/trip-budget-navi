@@ -59,6 +59,7 @@
 .rcard .minibar i { display: block; border-radius: 2px; min-width: 2px; }
 .rcard .meta { font-size: 12px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
 .rcard .why { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.6; }
+.rcard .golinks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .rcard .go { font-size: 13px; font-weight: 700; color: var(--accent); text-decoration: none; }
 .rcard .go:hover { text-decoration: underline; }
 .rcard .rank { font-family: var(--f-mono); font-size: 11px; font-weight: 700; color: var(--on-accent); background: var(--accent); border-radius: 99px; padding: 1px 9px; }

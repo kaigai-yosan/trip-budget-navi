@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅のしおりを作る｜海外旅行予算ナビ</title>
+<meta name="description" content="行き先と日程を選ぶだけで、日ごとの旅のしおりを自動で作ります。ChatGPTやClaudeにそのまま頼める依頼文もワンタップでコピーできます。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;600;700&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/find.css">
+<link rel="stylesheet" href="assets/plan.css">
+</head>
+<body class="findpage planpage">
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html">海外旅行予算ナビ</a>
+    <h1>旅のしおりを作る</h1>
+    <p>行き先・日程・やりたいことを選ぶと、日ごとの旅のしおりと予算の目安を自動で作ります。もっと細かく作りたいときは、AIに頼むための文章をコピーして、好きなAIに貼り付けてください。</p>
+  </header>
+
+  <section class="glass block" aria-labelledby="formTitle">
+    <h2 id="formTitle">条件を選ぶ</h2>
+    <form id="pForm" class="bform" autocomplete="off">
+      <div class="field">
+        <label for="pCity">行き先</label>
+        <select id="pCity"></select>
+      </div>
+      <div class="field">
+        <label for="pFrom">出発する地域</label>
+        <select id="pFrom"></select>
+      </div>
+      <div class="field">
+        <label for="pDep">出発日</label>
+        <input type="date" id="pDep">
+      </div>
+      <div class="field">
+        <label for="pDays">日数</label>
+        <input type="number" id="pDays" min="2" max="21" step="1" value="5" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="pPeople">人数</label>
+        <select id="pPeople"><option value="1">1名</option><option value="2" selected>2名</option><option value="3">3名</option><option value="4">4名</option></select>
+      </div>
+      <div class="field">
+        <span class="lbl" id="pModeLbl">プラン</span>
+        <div class="seg" role="radiogroup" aria-labelledby="pModeLbl">
+          <label><input type="radio" name="pMode" value="student" checked><span>大学生の節約旅</span></label>
+          <label><input type="radio" name="pMode" value="standard"><span>標準</span></label>
+        </div>
+      </div>
+      <div class="field wide">
+        <span class="lbl" id="pIntLbl">やりたいこと（3つまで・選ぶと、その場所を優先します）</span>
+        <div class="chips" id="pInterests" role="group" aria-labelledby="pIntLbl"></div>
+      </div>
+      <div class="field wide">
+        <span class="lbl" id="pPaceLbl">旅のペース</span>
+        <div class="seg" role="radiogroup" aria-labelledby="pPaceLbl">
+          <label><input type="radio" name="pPace" value="relaxed"><span>ゆったり<small>1日2か所</small></span></label>
+          <label><input type="radio" name="pPace" value="normal" checked><span>ふつう<small>1日3か所</small></span></label>
+          <label><input type="radio" name="pPace" value="packed"><span>ぎっしり<small>1日5か所</small></span></label>
+        </div>
+      </div>
+    </form>
+    <div class="actions">
+      <button type="button" class="primary" id="reroll">別の組み合わせにする</button>
+      <span class="hint" id="pErr" role="alert"></span>
+    </div>
+  </section>
+
+  <section class="glass block" id="result" aria-live="polite">
+    <div id="pOverview" class="overview"></div>
+    <div class="actions noprint">
+      <button type="button" id="copyPlan">しおりをコピー</button>
+      <button type="button" id="printPlan">印刷する</button>
+      <span class="hint" id="copyMsg" role="status"></span>
+    </div>
+    <div id="pDayList" class="days"></div>
+    <div id="pCheck" class="check"></div>
+  </section>
+
+  <section class="glass block noprint" id="ai" aria-labelledby="aiTitle">
+    <h2 id="aiTitle">AIにもっと細かく作ってもらう</h2>
+    <p class="hint">上の条件と自動で作ったしおりを、AIへの依頼文にまとめました。コピーして、ChatGPT・Claude・Geminiなどに貼り付けると、時間や移動方法まで入った、より詳しいしおりを作ってもらえます。</p>
+    <div class="actions">
+      <button type="button" class="primary" id="copyPrompt">依頼文をコピー</button>
+      <a class="aibtn" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPTを開く ↗</a>
+      <a class="aibtn" href="https://claude.ai/new" target="_blank" rel="noopener">Claudeを開く ↗</a>
+      <a class="aibtn" href="https://gemini.google.com/app" target="_blank" rel="noopener">Geminiを開く ↗</a>
+      <span class="hint" id="promptMsg" role="status"></span>
+    </div>
+    <label class="hint" for="promptBox">依頼文（そのまま編集もできます）</label>
+    <textarea id="promptBox" rows="12"></textarea>
+    <p class="hint">AIの答えには、古い情報や間違いが混ざることがあります。営業時間・休館日・予約の要否・入国の条件は、必ず公式サイトで確認してください。</p>
+  </section>
+
+  <footer class="glass noprint">
+    <p>スポットは代表的な観光地・食べ物の一例です。営業日・入場料・予約の要否は変わるので、出発前に公式サイトで確認してください。金額は当サイト独自の目安です。</p>
+    <nav aria-label="サイト情報">
+      <a href="index.html">トップ</a>
+      <a href="find.html">予算から行き先を探す</a>
+      <a href="map.html">旅の世界地図</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+      <a href="disclaimer.html">免責事項・運営者情報</a>
+      <a href="contact.html">お問い合わせ</a>
+    </nav>
+  </footer>
+</div>
+<script src="assets/data.js"></script>
+<script src="assets/entry.js"></script>
+<script src="assets/spots.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/planner.js"></script>
+</body>
+</html>

@@ -55,6 +55,7 @@ header p { margin: 6px 0 0; color: var(--ink-2); max-width: 60ch; }
 }
 .maplink:hover { background: var(--accent); color: var(--on-accent); }
 .maplink + .maplink { margin-left: 8px; }
+@media (max-width: 520px) { .maplink + .maplink { margin-left: 0; } }
 .eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; text-decoration: none; }
 a.eyebrow:hover { text-decoration: underline; }
 

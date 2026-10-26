@@ -34,6 +34,11 @@
     if (o.dep) q.push("dep=" + fmtDate(o.dep));
     return "cities/" + t.id + ".html?" + q.join("&") + "#form";
   }
+  function planLink(t, o) {
+    var q = ["city=" + t.id, "mode=" + o.mode, "days=" + o.days, "people=" + o.people, "from=" + o.from.id];
+    if (o.dep) q.push("dep=" + fmtDate(o.dep));
+    return "plan.html?" + q.join("&");
+  }
   function miniBar(e) {
     var total = e.total || 1;
     return '<div class="minibar" aria-hidden="true">' + e.items.map(function (it) {
@@ -56,7 +61,8 @@
       '<div class="price">約' + man(r.per) + "<small>万円</small></div>" + diffHtml + miniBar(e) +
       '<div class="meta"><span>現地' + e.nights + "泊" + (r.t.night ? "（機内泊あり）" : "") + "</span><span>航空券 " + yen(e.flight1) + "</span><span>" + esc(airName(r)) + "</span></div>" +
       (extra.why ? '<p class="why">' + esc(extra.why) + "</p>" : "") +
-      '<a class="go" href="' + esc(linkTo(r.t, o)) + '">この条件で詳しく計算する →</a></article>';
+      '<div class="golinks"><a class="go" href="' + esc(linkTo(r.t, o)) + '">詳しく計算する →</a>' +
+      '<a class="go" href="' + esc(planLink(r.t, o)) + '">しおりを作る →</a></div></article>';
   }
 
   // ===== 初期化 =====
