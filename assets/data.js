@@ -352,5 +352,22 @@
     { id: "beijing", name: "北京", code: "PEK", ht: [6000, 13000], fd: [3000, 5500], tr: [800, 1500], ac: [2000, 4000] }
   ];
 
-  window.TRIP = { FROM: FROM, TO: TO, TIPS: TIPS, HUBS: HUBS };
+  // 行き先診断で使う雰囲気のタグ。food=グルメ beach=ビーチ・リゾート city=街歩き・買い物
+  // culture=歴史・文化 nature=絶景・自然 night=夜景・ナイトライフ easy=初めてでも行きやすい（近い・治安・観光しやすい）
+  var VIBES = {
+    seoul: ["food", "city", "night", "easy"], busan: ["food", "beach", "easy"], taipei: ["food", "culture", "night", "easy"],
+    hongkong: ["food", "city", "night", "easy"], shanghai: ["city", "culture", "night"], bangkok: ["food", "culture", "night"],
+    hcm: ["food", "culture", "city"], danang: ["beach", "food", "nature"], singapore: ["city", "food", "night", "easy"],
+    bali: ["beach", "nature", "culture"], cebu: ["beach", "nature"], kualalumpur: ["food", "city", "night"],
+    hanoi: ["food", "culture"], siemreap: ["culture", "nature"], jeju: ["nature", "food", "easy"],
+    guam: ["beach", "easy"], honolulu: ["beach", "nature", "city", "easy"], sydney: ["city", "beach", "nature"],
+    cairns: ["nature", "beach"], melbourne: ["food", "city", "culture"], auckland: ["nature", "city"],
+    newyork: ["city", "culture", "night", "food"], la: ["city", "beach", "night"], sanfrancisco: ["city", "nature", "food"],
+    lasvegas: ["night", "city", "nature"], vancouver: ["nature", "city", "food"], london: ["culture", "city", "night"],
+    paris: ["culture", "food", "city"], rome: ["culture", "food"], barcelona: ["culture", "food", "beach", "night"],
+    amsterdam: ["culture", "city"], prague: ["culture", "night"], helsinki: ["nature", "city"],
+    istanbul: ["culture", "food"], dubai: ["city", "night", "nature"]
+  };
+
+  window.TRIP = { FROM: FROM, TO: TO, TIPS: TIPS, HUBS: HUBS, VIBES: VIBES };
 })();

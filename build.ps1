@@ -76,6 +76,7 @@ foreach ($c in $cfg.cities) {
 [void]$urls.Add($site + "/disclaimer.html")
 [void]$urls.Add($site + "/contact.html")
 [void]$urls.Add($site + "/map.html")
+[void]$urls.Add($site + "/find.html")
 
 $sm = New-Object System.Text.StringBuilder
 [void]$sm.Append('<?xml version="1.0" encoding="UTF-8"?>' + "`n")

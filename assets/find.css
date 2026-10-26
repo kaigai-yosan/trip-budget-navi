@@ -1,0 +1,76 @@
+/* 予算から探す・行き先診断（予算ナビと同じ色・フォント） */
+.findpage .wrap { gap: 22px; }
+.findpage h2 { margin: 0; font-size: 18px; }
+.findpage .block { padding: 22px; display: grid; gap: 16px; scroll-margin-top: 16px; }
+.findpage .hint { font-size: 12px; color: var(--muted); margin: 0; }
+.findpage .field { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.findpage .field > label, .findpage .field > .lbl, .findpage .q legend { font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.04em; padding: 0; }
+.findpage input[type="number"], .findpage input[type="date"], .findpage select {
+  font: inherit; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; min-width: 0;
+}
+.findpage input:focus-visible, .findpage select:focus-visible, .findpage button:focus-visible, .findpage a:focus-visible,
+.findpage .seg input:focus-visible + span, .findpage .chips input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.findpage .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--paper); }
+.findpage .seg label { position: relative; cursor: pointer; }
+.findpage .seg input { position: absolute; opacity: 0; inset: 0; }
+.findpage .seg span { display: block; text-align: center; padding: 10px 6px; font-size: 13px; border-left: 1px solid var(--line); height: 100%; }
+.findpage .seg label:first-child span { border-left: 0; }
+.findpage .seg input:checked + span { background: var(--accent); color: var(--on-accent); font-weight: 700; }
+.findpage .seg label:hover span { background: var(--accent-soft); }
+.findpage .seg input:checked + span:hover { background: var(--accent); }
+@media (max-width: 520px) { .findpage .seg { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(2, 1fr); } .findpage .seg span { border-top: 1px solid var(--line); } }
+
+.tabs { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.tab { font-size: 13px; font-weight: 700; text-decoration: none; color: var(--accent); padding: 6px 14px; border: 1px solid var(--accent); border-radius: 99px; background: color-mix(in srgb, var(--paper) 80%, transparent); transition: background-color .15s ease, color .15s ease; }
+.tab:hover { background: var(--accent); color: var(--on-accent); }
+
+.bform { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.bform .wide { grid-column: 1 / -1; }
+@media (max-width: 760px) { .bform { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .bform { grid-template-columns: minmax(0, 1fr); } }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips label { position: relative; cursor: pointer; }
+.chips input { position: absolute; opacity: 0; inset: 0; }
+.chips span { display: inline-block; padding: 7px 14px; border: 1px solid var(--line); border-radius: 99px; background: var(--paper); font-size: 13px; transition: background-color .15s ease, border-color .15s ease; }
+.chips label:hover span { border-color: var(--accent); }
+.chips input:checked + span { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 700; }
+.chips input:disabled + span { opacity: .45; cursor: not-allowed; }
+
+.resbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 16px; }
+.summary { margin: 0; font-size: 15px; font-weight: 700; }
+.summary b { font-family: var(--f-mono); color: var(--accent); }
+.sortsel { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.sortsel select { width: auto; padding: 7px 10px; }
+
+.results { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+.rcard { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; animation: rise .5s cubic-bezier(.2, .7, .2, 1) backwards; }
+.rcard.over { opacity: .78; }
+.results.static .rcard { animation: none; }
+.rcard .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rcard .name { font-family: var(--f-display); font-size: 18px; line-height: 1.3; }
+.rcard .code { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.rcard .price { font-family: var(--f-display); font-size: 28px; line-height: 1.15; }
+.rcard .price small { font-size: .5em; margin-left: 2px; }
+.rcard .diff { font-size: 12px; font-weight: 700; color: var(--s6); }
+.rcard .diff.neg { color: var(--warn); }
+.rcard .minibar { display: flex; gap: 2px; height: 10px; }
+.rcard .minibar i { display: block; border-radius: 2px; min-width: 2px; }
+.rcard .meta { font-size: 12px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.rcard .why { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.6; }
+.rcard .go { font-size: 13px; font-weight: 700; color: var(--accent); text-decoration: none; }
+.rcard .go:hover { text-decoration: underline; }
+.rcard .rank { font-family: var(--f-mono); font-size: 11px; font-weight: 700; color: var(--on-accent); background: var(--accent); border-radius: 99px; padding: 1px 9px; }
+.quizres { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.quizres .rcard:first-child { border-color: var(--accent); }
+
+.qform { display: grid; gap: 16px; }
+.q { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 8px; }
+.qrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 620px) { .qrow { grid-template-columns: minmax(0, 1fr); } }
+.findpage .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.findpage button.primary { font: inherit; font-size: 14px; font-weight: 700; color: var(--paper); background: var(--ink); border: 1px solid var(--ink); border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: background-color .15s ease, transform .15s ease; }
+.findpage button.primary:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) { .rcard { animation: none; } .findpage button.primary:hover { transform: none; } }

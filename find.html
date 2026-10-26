@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>予算から行き先を探す｜海外旅行予算ナビ</title>
+<meta name="description" content="予算と日数を入れると、行ける海外の都市が一覧でわかります。いくつかの質問に答える行き先診断で、あなたに合う旅行先も見つかります。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;600;700&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/find.css">
+</head>
+<body class="findpage">
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html">海外旅行予算ナビ</a>
+    <h1>予算から行き先を探す</h1>
+    <p>予算と日数を入れると、行ける都市がわかります。行き先が決まっていないときは、質問に答える診断もどうぞ。</p>
+    <nav class="tabs" aria-label="機能の切り替え">
+      <a href="#budget" class="tab">予算から探す</a>
+      <a href="#quiz" class="tab">行き先診断</a>
+    </nav>
+  </header>
+
+  <section class="glass block" id="budget" aria-labelledby="budgetTitle">
+    <h2 id="budgetTitle">予算から探す</h2>
+    <form id="bForm" class="bform" autocomplete="off">
+      <div class="field">
+        <label for="bBudget">1人あたりの予算（万円）</label>
+        <input type="number" id="bBudget" min="3" max="200" step="1" value="15" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="bDays">日数</label>
+        <input type="number" id="bDays" min="2" max="21" step="1" value="5" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="bPeople">人数</label>
+        <select id="bPeople"><option value="1">1名</option><option value="2" selected>2名</option><option value="3">3名</option><option value="4">4名</option></select>
+      </div>
+      <div class="field">
+        <label for="bFrom">出発する地域</label>
+        <select id="bFrom"></select>
+      </div>
+      <div class="field">
+        <label for="bDep">出発日（空欄なら通常期の目安）</label>
+        <input type="date" id="bDep">
+      </div>
+      <div class="field">
+        <span class="lbl" id="bModeLbl">プラン</span>
+        <div class="seg" role="radiogroup" aria-labelledby="bModeLbl">
+          <label><input type="radio" name="bMode" value="student" checked><span>大学生の節約旅</span></label>
+          <label><input type="radio" name="bMode" value="standard"><span>標準</span></label>
+        </div>
+      </div>
+      <div class="field wide">
+        <span class="lbl" id="bAreaLbl">地域で絞る</span>
+        <div class="chips" id="bAreas" role="group" aria-labelledby="bAreaLbl"></div>
+      </div>
+    </form>
+    <div class="resbar">
+      <p class="summary" id="bSummary" role="status"></p>
+      <label class="sortsel" for="bSort">並べ方
+        <select id="bSort"><option value="near">予算に近い順</option><option value="cheap">安い順</option></select>
+      </label>
+    </div>
+    <div class="results" id="bResults"></div>
+    <p class="hint" id="bNote"></p>
+  </section>
+
+  <section class="glass block" id="quiz" aria-labelledby="quizTitle">
+    <h2 id="quizTitle">行き先診断</h2>
+    <p class="hint">6つの質問に答えると、あなたに合いそうな行き先を5つおすすめします。</p>
+    <form id="qForm" class="qform" autocomplete="off">
+      <fieldset class="q">
+        <legend>① やりたいことは？（2つまで）</legend>
+        <div class="chips" id="qInterests"></div>
+      </fieldset>
+      <fieldset class="q">
+        <legend>② 日数は？</legend>
+        <div class="seg" role="radiogroup">
+          <label><input type="radio" name="qDays" value="4"><span>3〜4日</span></label>
+          <label><input type="radio" name="qDays" value="6" checked><span>5〜6日</span></label>
+          <label><input type="radio" name="qDays" value="8"><span>7〜9日</span></label>
+          <label><input type="radio" name="qDays" value="12"><span>10日以上</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="q">
+        <legend>③ 1人あたりの予算は？</legend>
+        <div class="seg" role="radiogroup">
+          <label><input type="radio" name="qBudget" value="10"><span>〜10万円</span></label>
+          <label><input type="radio" name="qBudget" value="20" checked><span>〜20万円</span></label>
+          <label><input type="radio" name="qBudget" value="30"><span>〜30万円</span></label>
+          <label><input type="radio" name="qBudget" value="50"><span>〜50万円</span></label>
+          <label><input type="radio" name="qBudget" value="0"><span>気にしない</span></label>
+        </div>
+      </fieldset>
+      <div class="qrow">
+        <fieldset class="q">
+          <legend>④ 行く時期は？</legend>
+          <select id="qMonth" aria-label="行く月"></select>
+        </fieldset>
+        <fieldset class="q">
+          <legend>⑤ 旅のスタイルは？</legend>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="qMode" value="student" checked><span>大学生の節約旅</span></label>
+            <label><input type="radio" name="qMode" value="standard"><span>標準</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="qrow">
+        <fieldset class="q">
+          <legend>⑥ 海外旅行は？</legend>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="qFirst" value="1" checked><span>初めて・不安</span></label>
+            <label><input type="radio" name="qFirst" value="0"><span>慣れている</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="q">
+          <legend>出発する地域</legend>
+          <select id="qFrom" aria-label="出発する地域"></select>
+        </fieldset>
+      </div>
+      <div class="actions"><button type="submit" class="primary">診断する</button><span class="hint" id="qMsg" role="status"></span></div>
+    </form>
+    <div class="results quizres" id="qResults"></div>
+  </section>
+
+  <footer class="glass">
+    <p>金額は当サイト独自の目安です。実際の料金は予約前に必ず確認してください。結果のカードから、日程や航空会社を選んで詳しく計算できます。</p>
+    <nav aria-label="サイト情報">
+      <a href="index.html">トップ</a>
+      <a href="map.html">旅の世界地図</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+      <a href="disclaimer.html">免責事項・運営者情報</a>
+      <a href="contact.html">お問い合わせ</a>
+    </nav>
+  </footer>
+</div>
+<script src="assets/data.js"></script>
+<script src="assets/entry.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/finder.js"></script>
+</body>
+</html>

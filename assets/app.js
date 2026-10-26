@@ -236,6 +236,13 @@
     return h + "</div>";
   }
 
+  // 行き先を探すページ（find.html）からも同じ計算を使えるように公開する
+  window.TRIP_CALC = {
+    estimate: estimate, MODE: MODE, TYPE: TYPE, defaultAirline: defaultAirline, defaultLccOpts: defaultLccOpts,
+    findTo: findTo, findFrom: findFrom, yen: yen, man: man, DAY: DAY
+  };
+  if (!document.getElementById("form")) return; // 見積もりの入力欄がないページ（find.htmlなど）はここまで
+
   // ===== 初期化 =====
   var pageCity = document.body.getAttribute("data-city");
   FROM.forEach(function (f) {
@@ -601,6 +608,19 @@
   $("minus").addEventListener("click", function () { shiftReturn(-1); });
   $("plus").addEventListener("click", function () { shiftReturn(1); });
   $("clearOverride").addEventListener("click", function () { $("override").value = ""; render(); });
+
+  // find.html からのリンク（?mode=student&days=5&people=2&from=kanto&dep=2026-12-10）で条件を引き継ぐ
+  (function applyParams() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var m = q.get("mode");
+    if (m === "student" || m === "standard") { var r = document.querySelector('input[name="mode"][value="' + m + '"]'); if (r) r.checked = true; }
+    var pe = q.get("people"); if (pe && /^[1-6]$/.test(pe)) $("people").value = pe;
+    var fr = q.get("from"); if (fr && findFrom(fr)) $("from").value = fr;
+    var dp = q.get("dep"); if (dp && /^\d{4}-\d{2}-\d{2}$/.test(dp)) $("dep").value = dp;
+    var dy = parseInt(q.get("days"), 10);
+    if (dy >= 2 && dy <= 60) { var d1 = parseDate($("dep").value); if (d1) $("ret").value = fmtDate(new Date(d1.getTime() + (dy - 1) * DAY)); }
+  })();
 
   $("dep").dataset.prev = $("dep").value;
   fillAirlines();

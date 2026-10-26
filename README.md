@@ -10,6 +10,7 @@
 | `templates/page.html` | 上のページの元になるテンプレート |
 | `site.json` | サイトのURL、更新日、ページのタイトル・説明文、都市の一覧 |
 | `assets/data.js` | 料金の相場、航空会社、旅行先の注意点 |
+| `find.html`、`assets/finder.js`、`assets/find.css` | 予算から行き先を探す（予算逆算）と行き先診断。見積もりは app.js の計算を共用。診断で使う都市のタグは `assets/data.js` の `VIBES` |
 | `map.html`、`assets/map.js`、`assets/map.css` | 旅の世界地図。写真を撮った場所を地図に貼る。写真はユーザーのブラウザ内（IndexedDB）にだけ保存し、サーバーには送らない |
 | `assets/entry.js` | 入国情報（ビザ・渡航認証）。施行日つきで管理し、旅行の日付に合わせて自動で切り替わる |
 | `assets/affiliates.js` | アフィリエイトリンクの設定（収益化） |
