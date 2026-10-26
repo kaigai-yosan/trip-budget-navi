@@ -270,6 +270,157 @@
         [[70, 120], [54, 200], [40, 270], [28, 330], [16, 370], [4, 420]].reduce(function (y, s) { R(c, 700 - s[0] / 2, y, s[0], s[1] - y); return s[1]; }, 0);
         c.beginPath(); c.moveTo(190, 40); c.lineTo(190, 270); c.quadraticCurveTo(300, 220, 290, 40); c.closePath(); c.fill();
         R(c, 186, 40, 4, 250); R(c, 170, 30, 140, 12);
+      } },
+    kualalumpur: { cap: "ペトロナス・ツインタワーとKLタワー", h: 200, h2: 30, sun: [180, 300],
+      far: function (c, a, b) { skyline(c, a, b, 40, 140, 181, 18, 44); },
+      near: function (c, a, b) {
+        skyline(c, a, 240, 30, 90, 183); skyline(c, 760, b, 30, 110, 185);
+        [610, 700].forEach(function (x) {
+          [[56, 190], [48, 250], [40, 290], [32, 320], [22, 345], [12, 360]].reduce(function (y, s) { R(c, x - s[0] / 2, y, s[0], s[1] - y); return s[1]; }, 0);
+          P(c, [[x - 6, 360], [x + 6, 360], [x, 420]]);
+        });
+        R(c, 638, 168, 34, 8);
+        c.lineWidth = 3; c.beginPath(); c.moveTo(645, 120); c.lineTo(655, 168); c.lineTo(665, 120); c.stroke();
+        R(c, 296, 0, 8, 250); E(c, 300, 262, 26, 14); R(c, 288, 248, 24, 12); R(c, 299, 276, 2, 70);
+        palm(c, 120, 180, 12);
+      } },
+    hanoi: { cap: "ホアンキエム湖の亀の塔と朱色の橋", h: 160, h2: 40, water: 70, sun: [820, 300],
+      far: function (c, a, b) { skyline(c, a, b, 30, 80, 191, 20, 46); },
+      near: function (c) {
+        [120, 220, 900].forEach(function (x, i) { R(c, x - 4, 60, 8, 60); E(c, x, 140 + i * 6, 60, 46); });
+        E(c, 480, 72, 70, 8);
+        R(c, 450, 72, 60, 56); R(c, 458, 128, 44, 40); R(c, 466, 168, 28, 30);
+        P(c, [[442, 128], [518, 128], [508, 136], [452, 136]]); P(c, [[452, 168], [508, 168], [500, 175], [460, 175]]); P(c, [[460, 198], [500, 198], [480, 214]]);
+        cut(c, function () { arch(c, 470, 76, 20, 34); arch(c, 472, 136, 16, 24); C(c, 480, 184, 6); });
+        c.lineWidth = 7; c.beginPath(); c.moveTo(620, 72); c.quadraticCurveTo(720, 118, 820, 72); c.stroke();
+        c.lineWidth = 2;
+        for (var x = 640; x <= 800; x += 20) { var t = (x - 620) / 200, y = 72 + 2 * t * (1 - t) * 46; c.beginPath(); c.moveTo(x, y); c.lineTo(x, y + 14); c.stroke(); }
+        c.beginPath(); c.moveTo(620, 86); c.quadraticCurveTo(720, 132, 820, 86); c.stroke();
+      } },
+    siemreap: { cap: "アンコール・ワットの朝日", h: 25, h2: 35, water: 50, sun: [500, 220],
+      far: function (c, a, b) { hills(c, a, b, 60, 10, 201); [80, 150, 860, 930].forEach(function (x, i) { palm(c, x, 170 + (i % 2) * 30, 6, 40); }); },
+      near: function (c) {
+        function bud(x, w, y0, h) {
+          c.beginPath(); c.moveTo(x - w / 2, y0); c.lineTo(x - w / 2, y0 + h * 0.35);
+          c.quadraticCurveTo(x - w / 2, y0 + h * 0.85, x, y0 + h); c.quadraticCurveTo(x + w / 2, y0 + h * 0.85, x + w / 2, y0 + h * 0.35);
+          c.lineTo(x + w / 2, y0); c.closePath(); c.fill();
+        }
+        R(c, 220, 50, 560, 36); R(c, 290, 86, 420, 40); R(c, 360, 126, 280, 30);
+        bud(330, 50, 86, 150); bud(670, 50, 86, 150); bud(420, 58, 126, 170); bud(580, 58, 126, 170); bud(500, 80, 156, 210);
+        cut(c, function () { for (var x = 240; x < 770; x += 30) R(c, x, 56, 14, 22); });
+      } },
+    jeju: { cap: "城山日出峰とトルハルバン", h: 200, h2: 190, water: 55, sun: [200, 290],
+      far: function (c, a, b) { P(c, [[a, 0], [a, 60], [250, 120], [450, 175], [520, 180], [600, 172], [800, 110], [b, 60], [b, 0]]); },
+      near: function (c, a) {
+        P(c, [[600, 0], [600, 55], [660, 170], [700, 192], [722, 182], [760, 196], [800, 184], [830, 190], [880, 120], [930, 55], [930, 0]]);
+        P(c, [[a, 0], [a, 70], [260, 64], [340, 40], [400, 0]]);
+        E(c, 200, 120, 30, 50); E(c, 200, 190, 22, 26); R(c, 176, 210, 48, 8); E(c, 200, 222, 18, 12);
+        palm(c, 380, 170, 10);
+      } },
+    cairns: { cap: "グレートバリアリーフと熱帯雨林", h: 190, h2: 165, water: 65, sun: [800, 300],
+      far: function (c, a, b) { hills(c, a, b, 170, 45, 211); },
+      near: function (c, a) {
+        P(c, [[a, 0], [a, 90], [140, 85], [300, 60], [380, 0]]);
+        palm(c, 90, 250, 30); palm(c, 180, 200, -20); palm(c, 260, 150, 15);
+        E(c, 720, 66, 110, 10); palm(c, 700, 120, 8, 40); palm(c, 740, 100, -6, 34);
+        P(c, [[470, 50], [585, 50], [600, 68], [460, 68]]); R(c, 490, 68, 70, 18); R(c, 520, 86, 6, 30);
+      } },
+    melbourne: { cap: "フリンダース・ストリート駅とトラム", h: 210, h2: 30, sun: [820, 300],
+      far: function (c, a, b) { skyline(c, a, b, 60, 230, 221, 18, 40); },
+      near: function (c) {
+        R(c, 240, 0, 380, 110);
+        R(c, 350, 110, 64, 30); C(c, 382, 140, 34); R(c, 379, 172, 6, 20); C(c, 382, 194, 4);
+        R(c, 545, 110, 30, 90); P(c, [[540, 200], [580, 200], [560, 228]]);
+        cut(c, function () { for (var x = 256; x < 610; x += 40) arch(c, x, 10, 24, 60); C(c, 560, 175, 9); });
+        R(c, 660, 0, 180, 50); R(c, 670, 50, 160, 6);
+        cut(c, function () { for (var x = 672; x < 830; x += 26) R(c, x, 22, 18, 18); });
+        c.lineWidth = 2; c.beginPath(); c.moveTo(740, 56); c.lineTo(760, 80); c.lineTo(790, 80); c.stroke();
+      } },
+    auckland: { cap: "スカイタワーとランギトト島", h: 200, h2: 180, water: 50, sun: [200, 320],
+      far: function (c, a, b) { P(c, [[a, 0], [a, 50], [180, 62], [400, 140], [460, 148], [520, 140], [740, 62], [b, 50], [b, 0]]); },
+      near: function (c, a) {
+        skyline(c, 520, 860, 60, 170, 231, 16, 36);
+        P(c, [[606, 0], [634, 0], [627, 240], [613, 240]]);
+        E(c, 620, 252, 32, 14); R(c, 604, 256, 32, 18); E(c, 620, 278, 22, 8);
+        P(c, [[617, 284], [623, 284], [620, 400]]);
+        R(c, a, 64, 420 - a, 7);
+        for (var x = 60; x <= 400; x += 85) R(c, x, 0, 10, 64);
+        c.lineWidth = 6; c.beginPath(); c.moveTo(150, 70); c.quadraticCurveTo(230, 140, 310, 70); c.stroke();
+      } },
+    sanfrancisco: { cap: "ゴールデン・ゲート・ブリッジ", h: 205, h2: 25, water: 50, sun: [820, 320],
+      far: function (c, a, b) { hills(c, a, b, 120, 30, 241); },
+      near: function (c, a, b) {
+        R(c, a, 82, b - a, 10);
+        [330, 670].forEach(function (x) {
+          R(c, x - 20, 0, 11, 340); R(c, x + 9, 0, 11, 340);
+          [130, 220, 300, 334].forEach(function (y) { R(c, x - 20, y, 40, 8); });
+        });
+        c.lineWidth = 3; c.beginPath();
+        c.moveTo(a, 92); c.quadraticCurveTo(230, 120, 330, 338);
+        c.moveTo(330, 338); c.quadraticCurveTo(500, 30, 670, 338);
+        c.moveTo(670, 338); c.quadraticCurveTo(770, 120, b, 92);
+        c.stroke();
+        c.lineWidth = 1.2; c.beginPath();
+        for (var x = 350; x < 660; x += 16) { var t = (x - 330) / 340, y = (1 - t) * (1 - t) * 338 + 2 * t * (1 - t) * 30 + t * t * 338; c.moveTo(x, y); c.lineTo(x, 92); }
+        c.stroke();
+      } },
+    lasvegas: { cap: "ストリップの街並みと砂漠の山々", h: 255, h2: 20, sun: [180, 300],
+      far: function (c, a, b) { peaks(c, [[a, 60], [100, 140], [200, 110], [320, 190], [450, 120], [600, 170], [750, 110], [900, 160], [b, 90]]); },
+      near: function (c, a, b) {
+        skyline(c, 300, b, 60, 210, 251, 22, 50);
+        P(c, [[212, 0], [228, 0], [224, 300], [216, 300]]);
+        E(c, 220, 312, 32, 14); R(c, 204, 298, 32, 14); E(c, 220, 328, 24, 7); R(c, 219, 332, 2, 70);
+        c.lineWidth = 5; c.beginPath(); c.arc(820, 230, 85, 0, Math.PI * 2); c.stroke();
+        c.lineWidth = 4; c.beginPath(); c.moveTo(770, 0); c.lineTo(820, 230); c.lineTo(870, 0); c.stroke();
+        palm(c, 90, 200, 8, 45); palm(c, 140, 170, -6, 40);
+      } },
+    amsterdam: { cap: "運河沿いの家並みと風車", h: 200, h2: 30, water: 45, sun: [820, 330],
+      far: function (c, a, b) {
+        hills(c, a, b, 30, 8, 261);
+        P(c, [[880, 0], [920, 0], [912, 150], [888, 150]]); E(c, 900, 155, 14, 10);
+        c.lineWidth = 10; c.lineCap = "butt"; c.beginPath();
+        for (var k = 0; k < 4; k++) { var t = 0.4 + k * Math.PI / 2; c.moveTo(900, 155); c.lineTo(900 + Math.cos(t) * 95, 155 + Math.sin(t) * 95); }
+        c.stroke();
+      },
+      near: function (c, a, b) {
+        R(c, a, 40, b - a, 8);
+        var r = rng(263), x = 90;
+        while (x < 860) {
+          var w = 40 + r() * 22, h = 140 + r() * 70, kind = Math.floor(r() * 3), top = 45 + h;
+          R(c, x, 45, w - 2, h);
+          if (kind === 0) P(c, [[x, top], [x + w - 2, top], [x + (w - 2) / 2, top + 28]]);
+          else if (kind === 1) { R(c, x + w * 0.15, top, w * 0.7 - 2, 14); R(c, x + w * 0.3, top + 14, w * 0.4 - 2, 14); }
+          else { c.beginPath(); c.moveTo(x, top); c.quadraticCurveTo(x + w / 2, top + 50, x + w - 2, top); c.fill(); }
+          x += w;
+        }
+        cut(c, function () { var r2 = rng(265); for (var y = 70; y < 170; y += 30) for (var x2 = 98; x2 < 850; x2 += 16) if (r2() > 0.35) R(c, x2, y, 7, 14); });
+      } },
+    prague: { cap: "カレル橋とプラハ城", h: 215, h2: 30, water: 45, sun: [180, 320],
+      far: function (c, a, b) {
+        hills(c, a, b, 110, 15, 271);
+        R(c, 440, 100, 400, 46);
+        R(c, 548, 100, 24, 150); C(c, 560, 252, 14); P(c, [[555, 262], [565, 262], [560, 300]]);
+        spire(c, 620, 22, 290); spire(c, 650, 22, 290);
+      },
+      near: function (c, a, b) {
+        R(c, a, 45, b - a, 52);
+        cut(c, function () { for (var x = Math.floor(a / 130) * 130 + 20; x < b; x += 130) arch(c, x, 45, 100, 40); });
+        R(c, a, 97, b - a, 6);
+        for (var x = 230; x < b; x += 70) { R(c, x, 103, 6, 20); C(c, x + 3, 128, 5); }
+        R(c, 110, 97, 70, 130); P(c, [[104, 227], [186, 227], [145, 300]]);
+        cut(c, function () { arch(c, 130, 97, 30, 50); });
+      } },
+    helsinki: { cap: "ヘルシンキ大聖堂と港", h: 215, h2: 205, water: 50, sun: [820, 280],
+      far: function (c, a, b) { skyline(c, 640, b, 30, 90, 281, 24, 50); skyline(c, a, 300, 30, 70, 283, 24, 50); },
+      near: function (c) {
+        P(c, [[300, 0], [300, 40], [700, 40], [700, 0]]);
+        R(c, 340, 40, 320, 6); R(c, 370, 46, 260, 6);
+        R(c, 400, 52, 200, 110);
+        P(c, [[430, 162], [570, 162], [500, 192]]);
+        R(c, 468, 162, 64, 60); C(c, 500, 222, 34); R(c, 496, 252, 8, 18); C(c, 500, 274, 5);
+        [412, 588].forEach(function (x) { R(c, x - 8, 162, 16, 30); C(c, x, 194, 10); R(c, x - 1, 202, 2, 12); });
+        cut(c, function () { for (var x = 418; x < 590; x += 22) R(c, x, 60, 10, 70); });
+        P(c, [[75, 48], [245, 48], [260, 70], [60, 70]]); R(c, 100, 70, 120, 26); R(c, 180, 96, 16, 18);
       } }
   };
 
