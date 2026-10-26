@@ -11,7 +11,7 @@
 
 ## 1. 公開前の準備
 - [x] お問い合わせページ（`contact.html`）を作り、規約ページの連絡先をそこへのリンクにする
-- [ ] Googleフォームを作り、埋め込み用URLを `contact.html` の `GOOGLE_FORM_URL` に貼る
+- [x] Googleフォームを作り、埋め込み用URLを `contact.html` の `GOOGLE_FORM_URL` に貼る
 - [x] `privacy.html` と `disclaimer.html` の運営者名を記入する →「海外旅行予算ナビ編集部」
 - [x] 編集するフォルダを決める →「海外旅行」フォルダ
 - [ ] 主要な路線の航空券をSkyscannerで調べ、`assets/data.js` の相場（`base`）とずれていないか確認する
