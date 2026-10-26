@@ -424,6 +424,149 @@
       } }
   };
 
+  // ===== 2026年10月に追加した都市の背景 =====
+  // ランドマークは描かず、街の種類ごとの雰囲気（イメージ）で描く。説明にも「（イメージ）」と書く
+  function jag(a, b, seed, lo, hi) {
+    var r = rng(seed), pts = [[a, lo]], x = a;
+    while (x < b) { x += 60 + r() * 90; pts.push([x, lo + r() * (hi - lo)]); }
+    pts.push([b, lo]);
+    return pts;
+  }
+  function pagoda(c, x, w, y0, tiers) {
+    for (var i = 0; i < tiers; i++) {
+      var ww = w - i * 24, y = y0 + i * 50;
+      R(c, x - ww / 2 + 10, y, ww - 20, 28); roof(c, x, ww, y + 28, 20);
+    }
+    R(c, x - 2, y0 + tiers * 50 - 2, 4, 40);
+  }
+  var KINDS = {
+    skyline: {
+      far: function (c, a, b, s) { skyline(c, a, b, 40, 120, s, 20, 50); },
+      near: function (c, a, b, s) {
+        skyline(c, a, b, 60, 210, s + 1, 18, 40);
+        var r = rng(s + 2), x = 330 + r() * 340;
+        R(c, x, 0, 30, 300); P(c, [[x, 300], [x + 15, 345], [x + 30, 300]]); R(c, x + 14, 345, 2, 40);
+        R(c, x + 60, 0, 44, 240); R(c, x + 70, 240, 24, 30);
+      } },
+    beach: {
+      far: function (c, a, b, s) { hills(c, a, b, 70, 28, s); },
+      near: function (c, a, b) {
+        P(c, [[a, 0], [a, 70], [200, 64], [420, 36], [560, 0]]);
+        palm(c, 110, 240, 30); palm(c, 205, 180, -24); palm(c, 300, 140, 14);
+        P(c, [[640, 56], [770, 56], [786, 72], [624, 72]]); R(c, 700, 72, 3, 60); P(c, [[703, 130], [703, 78], [760, 78]]);
+        palm(c, b - 80, 200, -20);
+      } },
+    oldtown: {
+      far: function (c, a, b, s) { hills(c, a, b, 85, 26, s); },
+      near: function (c, a, b, s) {
+        var r = rng(s), x = a;
+        while (x < b) {
+          var w = 36 + r() * 30, h = 70 + r() * 90, k = r();
+          R(c, x, 0, w - 2, h);
+          if (k < 0.45) P(c, [[x - 2, h], [x + w, h], [x + (w - 2) / 2, h + 26]]);
+          else if (k < 0.7) R(c, x + 4, h, w - 10, 12);
+          x += w;
+        }
+        var cx = 300 + r() * 400;
+        R(c, cx - 30, 0, 60, 150); spire(c, cx, 34, 330);
+        R(c, cx + 80, 0, 36, 210); C(c, cx + 98, 170, 13); P(c, [[cx + 78, 210], [cx + 118, 210], [cx + 98, 250]]);
+        cut(c, function () { C(c, cx + 98, 170, 7); });
+      } },
+    mountain: {
+      far: function (c, a, b, s) { peaks(c, jag(a, b, s, 100, 280)); },
+      near: function (c, a, b, s) {
+        peaks(c, jag(a, b, s + 4, 50, 170));
+        var r = rng(s + 7);
+        for (var i = 0; i < 14; i++) { var x = a + 20 + r() * (b - a - 40), h = 40 + r() * 60; P(c, [[x - 12, 20], [x + 12, 20], [x, 20 + h]]); R(c, x - 1.5, 10, 3, 12); }
+        R(c, 450, 20, 70, 36); P(c, [[440, 56], [530, 56], [485, 84]]);
+      } },
+    temple: {
+      far: function (c, a, b, s) { hills(c, a, b, 60, 20, s); },
+      near: function (c) {
+        R(c, 340, 0, 320, 40);
+        pagoda(c, 500, 150, 40, 4); pagoda(c, 380, 90, 40, 2); pagoda(c, 620, 90, 40, 2);
+        palm(c, 160, 190, -16); palm(c, 840, 170, 14);
+      } },
+    desert: {
+      far: function (c, a, b, s) { hills(c, a, b, 40, 12, s, 0.6); },
+      near: function (c, a, b, s) {
+        hills(c, a, b, 55, 22, s + 3, 0.5);
+        R(c, 420, 0, 160, 100); C(c, 500, 100, 56); R(c, 497, 152, 6, 36);
+        [400, 600].forEach(function (x) { R(c, x - 8, 0, 16, 230); P(c, [[x - 12, 230], [x + 12, 230], [x, 262]]); C(c, x, 236, 9); });
+        palm(c, 160, 150, 10); palm(c, 850, 160, -10);
+      } },
+    harbor: {
+      far: function (c, a, b, s) { skyline(c, a, b, 30, 90, s, 22, 46); },
+      near: function (c, a, b) {
+        R(c, a, 40, b - a, 8);
+        [150, 420, 700].forEach(function (x) {
+          P(c, [[x, 56], [x + 90, 56], [x + 78, 40], [x + 12, 40]]);
+          R(c, x + 44, 56, 3, 90); P(c, [[x + 47, 140], [x + 47, 64], [x + 84, 64]]);
+        });
+        [260, 560, 880].forEach(function (x) { R(c, x, 48, 5, 150); R(c, x, 192, 80, 5); R(c, x + 74, 150, 3, 45); });
+      } },
+    island: {
+      far: function (c, a, b, s) { hills(c, a, b, 40, 16, s); },
+      near: function (c) {
+        E(c, 480, 60, 230, 46); palm(c, 420, 170, 12); palm(c, 510, 200, -8); palm(c, 575, 150, 14);
+        R(c, 690, 50, 140, 5); [700, 740, 780, 820].forEach(function (x) { R(c, x, 40, 3, 14); });
+        R(c, 706, 55, 76, 26); P(c, [[698, 81], [790, 81], [744, 112]]);
+      } },
+    pyramid: {
+      far: function (c, a, b, s) { hills(c, a, b, 30, 8, s, 0.5); },
+      near: function (c, a, b, s) {
+        hills(c, a, b, 50, 14, s + 1, 0.6);
+        P(c, [[300, 40], [500, 270], [700, 40]]); P(c, [[630, 40], [760, 180], [890, 40]]); P(c, [[150, 40], [220, 120], [290, 40]]);
+        palm(c, 90, 150, 10); palm(c, 940, 130, -8);
+      } }
+  };
+  var KIND_CAP = { skyline: "の高層ビル街", beach: "のビーチ", oldtown: "の街並み", mountain: "の山々", temple: "の寺院と街並み",
+    desert: "の砂漠と街並み", harbor: "の港", island: "の海と島", pyramid: "のピラミッド" };
+  function gen(id, kind, h, h2, sx, sy, water, seed) {
+    var K = KINDS[kind], name = id;
+    ((window.TRIP && window.TRIP.TO) || []).forEach(function (t) { if (t.id === id) name = t.name; });
+    var sc = { cap: name + KIND_CAP[kind] + "（イメージ）", h: h, h2: h2, sun: [sx, sy],
+      far: function (c, a, b) { K.far(c, a, b, seed); }, near: function (c, a, b) { K.near(c, a, b, seed); } };
+    if (water) sc.water = water;
+    SCENES[id] = sc;
+  }
+  // [id, 種類, 空の色相(上), 空の色相(地平線), 太陽のx, 太陽のy, 水面の高さ, 乱数の種]
+  [
+    ["manila", "harbor", 205, 30, 820, 300, 45, 301], ["boracay", "beach", 195, 175, 700, 300, 60, 302],
+    ["phuket", "beach", 190, 170, 200, 300, 60, 303], ["chiangmai", "temple", 165, 40, 800, 300, 0, 304],
+    ["samui", "beach", 195, 170, 760, 290, 60, 305], ["penang", "temple", 170, 35, 200, 300, 0, 306],
+    ["kotakinabalu", "island", 200, 175, 820, 300, 60, 307], ["langkawi", "island", 200, 170, 240, 290, 60, 308],
+    ["luangprabang", "temple", 160, 40, 780, 300, 0, 309], ["phnompenh", "temple", 25, 45, 220, 300, 0, 310],
+    ["beijing", "temple", 215, 340, 800, 300, 0, 311], ["chengdu", "skyline", 215, 30, 200, 300, 0, 312],
+    ["xian", "temple", 25, 45, 780, 290, 0, 313], ["guangzhou", "skyline", 25, 200, 820, 300, 45, 314],
+    ["kaohsiung", "harbor", 200, 30, 200, 300, 55, 315], ["tainan", "temple", 160, 40, 800, 290, 0, 316],
+    ["macau", "skyline", 215, 340, 820, 310, 45, 317], ["maldives", "island", 190, 170, 760, 300, 70, 318],
+    ["delhi", "oldtown", 35, 45, 800, 300, 0, 319], ["kathmandu", "mountain", 205, 200, 220, 300, 0, 320],
+    ["goldcoast", "skyline", 195, 170, 780, 300, 60, 321], ["perth", "harbor", 205, 30, 820, 300, 50, 322],
+    ["queenstown", "mountain", 205, 195, 800, 310, 55, 323], ["saipan", "beach", 195, 170, 220, 300, 60, 324],
+    ["palau", "island", 195, 175, 780, 300, 70, 325], ["tahiti", "island", 200, 170, 220, 300, 70, 326],
+    ["maui", "beach", 195, 45, 780, 290, 55, 327], ["seattle", "skyline", 205, 30, 780, 300, 50, 328],
+    ["chicago", "skyline", 215, 340, 200, 300, 45, 329], ["boston", "oldtown", 215, 30, 800, 300, 0, 330],
+    ["washingtondc", "oldtown", 205, 30, 820, 300, 0, 331], ["sandiego", "harbor", 195, 170, 220, 300, 55, 332],
+    ["orlando", "skyline", 200, 330, 800, 300, 0, 333], ["toronto", "skyline", 205, 30, 780, 300, 50, 334],
+    ["banff", "mountain", 205, 200, 800, 310, 55, 335], ["cancun", "beach", 190, 170, 740, 300, 60, 336],
+    ["mexicocity", "oldtown", 30, 45, 780, 300, 0, 337], ["lima", "mountain", 30, 40, 780, 290, 0, 338],
+    ["rio", "beach", 195, 170, 220, 300, 60, 339], ["buenosaires", "oldtown", 215, 340, 800, 300, 0, 340],
+    ["lisbon", "oldtown", 195, 40, 780, 300, 55, 341], ["madrid", "oldtown", 215, 30, 820, 300, 0, 342],
+    ["berlin", "skyline", 215, 340, 200, 300, 0, 343], ["munich", "oldtown", 215, 340, 800, 300, 0, 344],
+    ["vienna", "oldtown", 25, 45, 800, 300, 0, 345], ["budapest", "oldtown", 205, 30, 200, 300, 45, 346],
+    ["brussels", "oldtown", 215, 30, 780, 300, 0, 347], ["zurich", "mountain", 205, 200, 220, 300, 55, 348],
+    ["milan", "oldtown", 215, 340, 800, 300, 0, 349], ["florence", "oldtown", 30, 45, 780, 300, 0, 350],
+    ["venice", "oldtown", 200, 30, 220, 300, 55, 351], ["athens", "oldtown", 205, 40, 820, 300, 0, 352],
+    ["santorini", "island", 205, 175, 780, 300, 60, 353], ["copenhagen", "harbor", 205, 30, 220, 300, 50, 354],
+    ["stockholm", "harbor", 215, 340, 780, 300, 50, 355], ["oslo", "harbor", 205, 200, 800, 300, 50, 356],
+    ["dublin", "oldtown", 215, 30, 220, 300, 0, 357], ["edinburgh", "oldtown", 215, 340, 800, 300, 0, 358],
+    ["reykjavik", "mountain", 205, 200, 780, 310, 50, 359], ["dubrovnik", "harbor", 195, 40, 220, 300, 55, 360],
+    ["krakow", "oldtown", 215, 30, 800, 300, 0, 361], ["abudhabi", "desert", 30, 45, 780, 300, 0, 362],
+    ["doha", "skyline", 35, 45, 220, 300, 45, 363], ["cairo", "pyramid", 35, 45, 780, 300, 0, 364],
+    ["marrakech", "desert", 25, 45, 800, 300, 0, 365], ["capetown", "mountain", 205, 195, 220, 300, 55, 366]
+  ].forEach(function (r) { gen(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]); });
+
   function hsl(h, s, l, al) { return "hsla(" + h + "," + s + "%," + l + "%," + (al == null ? 1 : al) + ")"; }
   function isDark() {
     var t = document.documentElement.getAttribute("data-theme");

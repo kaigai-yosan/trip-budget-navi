@@ -181,7 +181,7 @@ window.TRIP_ENTRY = {
     ],
     // 以下は経由地としてだけ選べる都市
     doha: [
-      { text: "30日以内の観光はビザ不要で、到着時に無料で滞在許可が出ます。空港の外に出ない乗り継ぎなら入国手続きは不要です。" }
+      { text: "日本国籍の観光はビザ不要で、到着時に滞在許可が出ます（滞在できる日数は変わることがあるので、出発前に最新の条件を確認してください）。空港の外に出ない乗り継ぎなら入国手続きは不要です。" }
     ],
     frankfurt: [
       { from: "2025-10-12",
@@ -195,3 +195,81 @@ window.TRIP_ENTRY = {
     ]
   }
 };
+
+// ===== 2026年10月に追加した都市の入国情報 =====
+// 国ごとの共通ルールを使い回している。新しい変更が出たら、上の説明のとおり until と新しいルールを足す。
+(function (R, P) {
+  var CN = { from: "2024-11-30", until: "2026-12-31",
+    text: "30日以内の観光・商用・親族訪問・トランジットはビザ不要（中国の一方的なビザ免除措置）。31日以上の滞在や留学・就労はビザが必要です。",
+    after: "ビザ免除措置は2026年12月31日の入国までです。2027年以降の延長が発表されていなければ、ビザが必要になる可能性があります。",
+    src: ["在福岡中国総領事館", "https://fukuoka.china-consulate.gov.cn/jpn/xwdt/202601/t20260127_11845989.htm"] };
+  var TH = [
+    { from: "2024-07-15", until: "2026-09-14", text: "60日以内の観光はビザ不要。" },
+    { from: "2026-09-15", text: "30日以内の観光はビザ不要（60日から短縮）。入国日を1日目と数えるので、最長29泊30日です。入国前にTDAC（デジタル入国カード）の登録が必要です。",
+      src: ["トクトク旅行（報道）", "https://www.tokutenryoko.com/news/passage/18652"] }
+  ];
+  var MY = { text: "90日以内の観光はビザ不要。到着の3日前までに、マレーシア・デジタル・アライバル・カード（MDAC）を公式サイトで無料登録します。" };
+  var PH = { text: "30日以内の観光はビザ不要。到着前72時間以内にeTravelの登録が必要です。" };
+  var TW = { text: "90日以内の観光はビザ不要。入国カードはオンラインで事前に提出できます。" };
+  var KH = { fee: 5500, feeName: "観光ビザ",
+    text: "観光でもビザが必要です（30日・1回入国）。事前のe-Visa（オンライン申請）か、空港のアライバルビザ（30ドル、米ドル現金のみ）で取得します。入国の7日前からe-Arrival（無料）の登録も必要。公式以外の代行サイトは高額なので注意。",
+    src: ["カンボジア政府 e-Visa公式サイト", "https://www.evisa.gov.kh/"] };
+  var ESTA = { from: "2025-09-30", fee: 6500, feeName: "ESTA",
+    text: "ESTA（電子渡航認証）が必要です。申請料は40.27ドル（2025年9月30日に21ドルから値上げ）。出発の72時間前までに公式サイトで申請を。代行サイトは高額なので注意。",
+    src: ["米国税関・国境警備局 ESTA公式サイト", "https://esta.cbp.dhs.gov/"] };
+  var AU = { fee: 2000, feeName: "ETA", text: "ETA（電子渡航認証、20豪ドル）を公式アプリで申請します。食品・植物などの持ち込みは申告が厳しく、申告しないと罰金です。" };
+  var NZ = { from: "2024-10-01", fee: 10500, feeName: "NZeTA・観光税",
+    text: "NZeTA（電子渡航認証、アプリ申請で17NZドル）と、国際観光税IVL（100NZドル。2024年10月1日に35NZドルから値上げ）の支払いが必要です。3か月以内の観光はビザ不要。",
+    src: ["ニュージーランド移民局", "https://www.immigration.govt.nz/"] };
+  var CA = { fee: 800, feeName: "eTA", text: "eTA（電子渡航認証、7カナダドル）が必要です。" };
+  var SCH = { from: "2025-10-12", text: "90日以内の観光はビザ不要（シェンゲン協定）。入国審査で顔写真と指紋を登録する出入国システム（EES）が導入されています。" };
+  var UAE = { text: "30日以内の観光はビザ不要で、到着時に無料で滞在許可が出ます。" };
+  var ETIAS = "ETIAS（欧州渡航情報認証制度、申請料20ユーロの予定）の導入が予定されていますが、開始日は未定です。";
+
+  // アジア
+  R.manila = [PH]; R.boracay = [PH];
+  R.phuket = TH; R.chiangmai = TH; R.samui = TH;
+  R.penang = [MY]; R.kotakinabalu = [MY]; R.langkawi = [MY];
+  R.luangprabang = [{ text: "15日以内の観光はビザ不要です（それ以上はe-Visaなどが必要）。入国条件は変わりやすいので、出発前に最新の情報を確認してください。" }];
+  R.phnompenh = [KH];
+  R.chengdu = [CN]; R.xian = [CN]; R.guangzhou = [CN];
+  R.kaohsiung = [TW]; R.tainan = [TW];
+  R.macau = [{ text: "90日以内の観光はビザ不要。香港との行き来は、パスポートの提示が必要です。" }];
+  R.maldives = [{ text: "30日以内の観光はビザ不要（到着時に無料で発給）。入国前にオンラインの入国申告書の提出が必要です。最新の条件は出発前に確認してください。" }];
+  R.delhi = [{ fee: 3500, feeName: "e-Visa",
+    text: "観光ビザが必要です。事前のe-Visa（オンライン申請）で、30日・1回入国の料金は時期により10〜25ドルほどです。公式以外の代行サイトは高額なので注意。",
+    src: ["インド政府 e-Visa公式サイト", "https://indianvisaonline.gov.in/evisa/"] }];
+  R.kathmandu = [{ fee: 7500, feeName: "到着ビザ",
+    text: "観光ビザが必要です。空港で取得でき、30日で50ドル（15日30ドル、90日125ドル）。事前にオンラインで申請しておくと空港の手続きが早くなります。" }];
+  // ハワイ・グアム・オセアニア
+  R.goldcoast = [AU]; R.perth = [AU]; R.queenstown = [NZ];
+  R.saipan = [{ text: "45日以内の観光は、グアム・北マリアナ諸島ビザ免除プログラムで入国できます。ESTAがあれば90日まで滞在できます。" }];
+  R.palau = [{ text: "観光はビザ不要で、到着時に滞在許可が出ます。環境保護のための料金（100ドル）は、航空券に含まれて徴収されることが一般的です。" }];
+  R.tahiti = [{ text: "90日以内の観光はビザ不要（フランス領ポリネシア）。" }];
+  R.maui = [ESTA];
+  // 北米
+  ["seattle", "chicago", "boston", "washingtondc", "sandiego", "orlando"].forEach(function (id) { R[id] = [ESTA]; });
+  R.toronto = [CA]; R.banff = [CA];
+  // 中南米
+  R.cancun = [{ fee: 3500, feeName: "観光税",
+    text: "180日以内の観光はビザ不要。入国カード（FMM）の手続きがあり、キンタナロー州（カンクン）では観光税（Visitax、約500ペソ）がかかります（金額は要確認）。" }];
+  R.mexicocity = [{ text: "180日以内の観光はビザ不要。入国カード（FMM）の手続きがあります。許可される日数は入国審査で決まります。" }];
+  R.lima = [{ text: "90日以内の観光はビザ不要。マチュピチュの入場券は日時指定の事前予約が必須です。" }];
+  R.rio = [{ text: "90日以内の観光はビザ不要。" }];
+  R.buenosaires = [{ text: "90日以内の観光はビザ不要。" }];
+  // ヨーロッパ・中東
+  ["lisbon", "madrid", "berlin", "munich", "vienna", "budapest", "brussels", "zurich", "milan", "florence", "venice",
+    "athens", "santorini", "copenhagen", "stockholm", "oslo", "reykjavik", "dubrovnik", "krakow"].forEach(function (id) { R[id] = [SCH]; P[id] = ETIAS; });
+  R.dublin = [{ text: "90日以内の観光はビザ不要。アイルランドはシェンゲン圏ではなく、イギリスのETAとも別の制度です。" }];
+  R.edinburgh = [
+    { from: "2025-04-09", until: "2026-04-07", fee: 3300, feeName: "ETA", text: "ETA（電子渡航認証、16ポンド）の事前申請が必要。6か月以内の観光はビザ不要。" },
+    { from: "2026-04-08", fee: 4000, feeName: "ETA", text: "ETA（電子渡航認証、20ポンド）の事前申請が必要です（16ポンドから値上げ）。6か月以内の観光はビザ不要。",
+      src: ["英国政府 ETA案内", "https://www.gov.uk/guidance/apply-for-an-electronic-travel-authorisation-eta"] }
+  ];
+  R.abudhabi = [UAE];
+  // アフリカ
+  R.cairo = [{ fee: 4000, feeName: "ビザ",
+    text: "観光ビザが必要です。空港の到着ビザ（25ドル）か、事前のe-Visa（25ドル）で取得します。滞在は30日以内です。最新の条件は出発前に確認してください。" }];
+  R.marrakech = [{ text: "90日以内の観光はビザ不要。" }];
+  R.capetown = [{ text: "90日以内の観光はビザ不要。子ども連れの場合は、追加の書類が必要になることがあります。" }];
+})(window.TRIP_ENTRY.rules, window.TRIP_ENTRY.pending);

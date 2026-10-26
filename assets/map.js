@@ -24,7 +24,26 @@
     sanfrancisco: [-122.42, 37.77, "US"], lasvegas: [-115.14, 36.17, "US"], vancouver: [-123.12, 49.28, "CA"],
     london: [-0.13, 51.51, "GB"], paris: [2.35, 48.86, "FR"], rome: [12.5, 41.9, "IT"], barcelona: [2.17, 41.39, "ES"],
     amsterdam: [4.9, 52.37, "NL"], prague: [14.42, 50.08, "CZ"], helsinki: [24.94, 60.17, "FI"], istanbul: [28.98, 41.01, "TR"],
-    dubai: [55.27, 25.2, "AE"], doha: [51.53, 25.29, "QA"], frankfurt: [8.68, 50.11, "DE"]
+    dubai: [55.27, 25.2, "AE"], doha: [51.53, 25.29, "QA"], frankfurt: [8.68, 50.11, "DE"],
+    // 2026年10月に追加した都市
+    manila: [120.98, 14.6, "PH"], boracay: [121.92, 11.97, "PH"], phuket: [98.39, 7.88, "TH"], chiangmai: [98.99, 18.79, "TH"],
+    samui: [100.06, 9.51, "TH"], penang: [100.33, 5.41, "MY"], kotakinabalu: [116.07, 5.98, "MY"], langkawi: [99.84, 6.35, "MY"],
+    luangprabang: [102.13, 19.89, "LA"], phnompenh: [104.92, 11.56, "KH"], chengdu: [104.07, 30.57, "CN"], xian: [108.94, 34.34, "CN"],
+    guangzhou: [113.26, 23.13, "CN"], kaohsiung: [120.31, 22.63, "TW"], tainan: [120.21, 22.99, "TW"], macau: [113.54, 22.2, "MO"],
+    maldives: [73.51, 4.18, "MV"], delhi: [77.21, 28.61, "IN"], kathmandu: [85.32, 27.72, "NP"],
+    goldcoast: [153.43, -28.0, "AU"], perth: [115.86, -31.95, "AU"], queenstown: [168.66, -45.03, "NZ"], saipan: [145.75, 15.18, "MP"],
+    palau: [134.62, 7.5, "PW"], tahiti: [-149.57, -17.65, "PF"], maui: [-156.33, 20.8, "US"],
+    seattle: [-122.33, 47.61, "US"], chicago: [-87.63, 41.88, "US"], boston: [-71.06, 42.36, "US"], washingtondc: [-77.04, 38.91, "US"],
+    sandiego: [-117.16, 32.72, "US"], orlando: [-81.38, 28.54, "US"], toronto: [-79.38, 43.65, "CA"], banff: [-115.57, 51.18, "CA"],
+    cancun: [-86.85, 21.16, "MX"], mexicocity: [-99.13, 19.43, "MX"], lima: [-77.04, -12.05, "PE"], rio: [-43.17, -22.91, "BR"],
+    buenosaires: [-58.38, -34.6, "AR"],
+    lisbon: [-9.14, 38.72, "PT"], madrid: [-3.7, 40.42, "ES"], berlin: [13.4, 52.52, "DE"], munich: [11.58, 48.14, "DE"],
+    vienna: [16.37, 48.21, "AT"], budapest: [19.04, 47.5, "HU"], brussels: [4.35, 50.85, "BE"], zurich: [8.54, 47.38, "CH"],
+    milan: [9.19, 45.46, "IT"], florence: [11.26, 43.77, "IT"], venice: [12.33, 45.44, "IT"], athens: [23.73, 37.98, "GR"],
+    santorini: [25.43, 36.39, "GR"], copenhagen: [12.57, 55.68, "DK"], stockholm: [18.07, 59.33, "SE"], oslo: [10.75, 59.91, "NO"],
+    dublin: [-6.26, 53.35, "IE"], edinburgh: [-3.19, 55.95, "GB"], reykjavik: [-21.94, 64.15, "IS"], dubrovnik: [18.09, 42.65, "HR"],
+    krakow: [19.94, 50.06, "PL"], abudhabi: [54.37, 24.45, "AE"], cairo: [31.24, 30.04, "EG"], marrakech: [-8.0, 31.63, "MA"],
+    capetown: [18.42, -33.92, "ZA"]
   };
   var PLACES = D.TO.concat(D.HUBS || []).filter(function (c) { return CITY_POS[c.id]; }).map(function (c) {
     var p = CITY_POS[c.id];

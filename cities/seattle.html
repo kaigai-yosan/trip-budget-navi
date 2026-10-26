@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>シアトル旅行の予算はいくら？大学生の節約旅と標準プランの費用目安｜海外旅行予算ナビ</title>
+<meta name="description" content="シアトル旅行にかかる費用の目安を、大学生の節約旅と標準プランで比較。航空券・宿泊・食費などの内訳と、入国・治安・チップなどシアトル旅行の注意点もまとめています。">
+<link rel="canonical" href="https://knykdm119-cmyk.github.io/trip-budget-navi/cities/seattle.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="海外旅行予算ナビ">
+<meta property="og:title" content="シアトル旅行の予算はいくら？大学生の節約旅と標準プランの費用目安｜海外旅行予算ナビ">
+<meta property="og:description" content="シアトル旅行にかかる費用の目安を、大学生の節約旅と標準プランで比較。航空券・宿泊・食費などの内訳と、入国・治安・チップなどシアトル旅行の注意点もまとめています。">
+<meta property="og:url" content="https://knykdm119-cmyk.github.io/trip-budget-navi/cities/seattle.html">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;600;700&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- アクセス解析（Google Analyticsなど）を使う場合は、発行されたタグをここに貼る -->
+<!-- Google AdSenseの審査用コードもここに貼る -->
+</head>
+<body data-city="seattle">
+<canvas class="bg intro" id="bgA" aria-hidden="true"></canvas>
+<canvas class="bg" id="bgB" aria-hidden="true" style="opacity:0"></canvas>
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="../index.html">海外旅行予算ナビ</a>
+    <h1>シアトル旅行の予算</h1>
+    <p>シアトル旅行にかかる費用を、大学生の節約旅と標準プランで計算できます。日程や航空会社を変えると、すぐに見積もりが変わります。</p>
+    <a class="maplink" href="../find.html">予算から行き先を探す・行き先診断 →</a>
+    <a class="maplink" href="../plan.html">旅のしおりを作る →</a>
+    <a class="maplink" href="../map.html">旅の写真を貼る「自分だけの世界地図」→</a>
+    <div class="scene-cap" id="sceneCap"></div>
+  </header>
+
+  <section class="compare glass" id="compare" hidden aria-labelledby="cmpTitle">
+    <h2 id="cmpTitle"></h2>
+    <div class="cmp-grid" id="cmpGrid"></div>
+    <span class="hint" id="cmpNote"></span>
+  </section>
+
+  <div class="grid">
+    <form class="panel glass" id="form" autocomplete="off">
+      <div class="field">
+        <span class="lbl" id="modeLbl">プラン</span>
+        <div class="seg big" role="radiogroup" aria-labelledby="modeLbl">
+          <label><input type="radio" name="mode" id="mode0" value="student" checked><span>大学生の節約旅<small>LCC・ドミトリー・学割</small></span></label>
+          <label><input type="radio" name="mode" id="mode1" value="standard"><span>標準<small>直行便・ホテル</small></span></label>
+        </div>
+        <div class="hint" id="modeHint"></div>
+      </div>
+      <div class="field">
+        <label for="from">出発する地域</label>
+        <select id="from"></select>
+      </div>
+      <div class="field">
+        <label for="to">旅行先</label>
+        <select id="to"></select>
+      </div>
+      <div class="field">
+        <span class="lbl">日程</span>
+        <div class="dates">
+          <label>出発日<input type="date" id="dep"></label>
+          <label>帰国日<input type="date" id="ret"></label>
+        </div>
+        <div class="dayrow">
+          <button type="button" id="minus" aria-label="帰国日を1日早める">−</button>
+          <output id="daysOut">—</output>
+          <button type="button" id="plus" aria-label="帰国日を1日遅らせる">＋</button>
+          <span class="hint" id="nightsHint"></span>
+        </div>
+        <div class="err" id="dateErr" hidden></div>
+      </div>
+      <div class="field">
+        <label for="people">人数</label>
+        <select id="people">
+          <option value="1">1名</option><option value="2" selected>2名</option><option value="3">3名</option>
+          <option value="4">4名</option><option value="5">5名</option><option value="6">6名</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="airline">航空会社</label>
+        <select id="airline"></select>
+        <div class="hint" id="airlineHint"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">航空会社のオプション（1人往復）</span>
+        <div class="opts" id="opts"></div>
+      </div>
+      <div class="field">
+        <label for="hub">経由地（乗り継ぎ・立ち寄り）</label>
+        <select id="hub"></select>
+        <div class="stop-detail" id="stopDetail" hidden>
+          <div class="stop-row">
+            <select id="stopDir" aria-label="経由するのは行きか帰りか"><option value="out">行き</option><option value="back">帰り</option></select>
+            <input type="number" id="stopLen" min="1" max="23" value="5" inputmode="numeric" aria-label="経由地での時間または日数">
+            <select id="stopUnit" aria-label="時間か日数か"><option value="h">時間の乗り継ぎ</option><option value="d">泊の立ち寄り</option></select>
+          </div>
+          <label class="opt" id="goOutRow"><input type="checkbox" id="goOut">空港の外に出て市内を観光する</label>
+        </div>
+        <div class="hint" id="hubHint">乗り継ぎの待ち時間や、経由地に泊まる日数を予算に入れられます。</div>
+      </div>
+      <div class="sky">
+        <a class="sky-link" id="skyLink" href="#" target="_blank" rel="noopener">Skyscannerで実際の料金を見る <span class="pr" id="skyPr" hidden>PR</span> ↗</a>
+        <label for="override" class="hint">比較サイトで見つけた料金（1人あたり往復・円）を入力すると、その金額で計算します</label>
+        <div class="override">
+          <input type="number" id="override" min="0" step="100" placeholder="例：48000" inputmode="numeric">
+          <button type="button" id="clearOverride">目安に戻す</button>
+        </div>
+      </div>
+    </form>
+
+    <section class="ticket" aria-live="polite">
+      <div class="stub">
+        <div class="route">
+          <div class="ap"><b id="fromCode">HND</b><small id="fromName">関東</small></div>
+          <svg class="plane" id="planeSvg" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12H60" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3" fill="none"/><g class="plane-icon"><path d="M16 7c0-1-1-1-2-1H9L6 0H4l2 6H2L1 4H0l.5 3L0 10h1l1-2h4l-2 6h2l3-6h5c1 0 2 0 2-1z" fill="currentColor"/></g></svg>
+          <div class="via" id="viaBox" hidden><small>経由</small><b id="viaCode"></b><small id="viaLen"></small></div>
+          <div class="ap"><b id="toCode">—</b><small id="toName"></small></div>
+        </div>
+        <div class="meta" id="chips"></div>
+        <div class="flightline" id="flightline"></div>
+      </div>
+      <div class="body">
+        <div class="total">
+          <span class="k">予算の目安（全員分の合計）</span>
+          <span class="v" id="total">—</span>
+          <span class="range" id="range"></span>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="k">1人あたり</div><div class="v" id="perPerson">—</div></div>
+          <div class="kpi"><div class="k">1人1日あたり（航空券除く）</div><div class="v" id="perDay">—</div></div>
+          <div class="kpi"><div class="k">航空券（1人往復）</div><div class="v" id="flightPP">—</div></div>
+        </div>
+        <div class="factors">
+          <h3>航空券の計算に使った条件</h3>
+          <div class="flist" id="factors"></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" id="bar" role="img" aria-label="費用内訳のバー"></div>
+          <div class="tip" id="tip" hidden></div>
+        </div>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>項目</th><th>金額</th><th>割合</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <ul class="notes" id="notes"></ul>
+        <div class="book" id="book" hidden>
+          <h3>このプランを手配する <span class="pr" id="bookPr" hidden>PR</span></h3>
+          <div class="book-list" id="bookList"></div>
+        </div>
+        <a class="jump" href="#guide" id="jump">↓ 旅行先の注意点とInstagramの投稿を見る</a>
+      </div>
+    </section>
+  </div>
+
+  <section class="guide glass" id="guide" aria-labelledby="guideTitle">
+    <div class="guide-head">
+      <h2 id="guideTitle">旅行先の注意点</h2>
+      <span class="best" id="best"></span>
+    </div>
+    <div class="insta">
+      <h3>Instagramでみんなの投稿を見る</h3>
+      <div class="insta-row" id="insta"></div>
+      <span class="hint" id="instaHint"></span>
+    </div>
+    <div class="tips" id="tips"></div>
+    <div class="links">
+      入国条件や治安は変わることがあります。出発前に <a href="https://www.anzen.mofa.go.jp/" target="_blank" rel="noopener">外務省 海外安全ホームページ</a> と各国の大使館の情報を確認し、<a href="https://www.ezairyu.mofa.go.jp/tabireg/" target="_blank" rel="noopener">たびレジ</a> に登録しておくと現地の緊急情報がメールで届きます。
+    </div>
+  </section>
+
+  <nav class="cities glass" aria-labelledby="citiesTitle">
+    <h2 id="citiesTitle">都市別の旅行予算</h2>
+    <div class="citylinks"><div class="cl-group"><h3>アジア</h3><ul><li><a href="../cities/seoul.html">ソウル</a></li><li><a href="../cities/busan.html">釜山</a></li><li><a href="../cities/taipei.html">台北</a></li><li><a href="../cities/hongkong.html">香港</a></li><li><a href="../cities/shanghai.html">上海</a></li><li><a href="../cities/bangkok.html">バンコク</a></li><li><a href="../cities/hcm.html">ホーチミン</a></li><li><a href="../cities/danang.html">ダナン</a></li><li><a href="../cities/singapore.html">シンガポール</a></li><li><a href="../cities/bali.html">バリ島</a></li><li><a href="../cities/cebu.html">セブ島</a></li><li><a href="../cities/kualalumpur.html">クアラルンプール</a></li><li><a href="../cities/hanoi.html">ハノイ</a></li><li><a href="../cities/siemreap.html">シェムリアップ</a></li><li><a href="../cities/jeju.html">済州島</a></li><li><a href="../cities/manila.html">マニラ</a></li><li><a href="../cities/boracay.html">ボラカイ島</a></li><li><a href="../cities/phuket.html">プーケット</a></li><li><a href="../cities/chiangmai.html">チェンマイ</a></li><li><a href="../cities/samui.html">サムイ島</a></li><li><a href="../cities/penang.html">ペナン島</a></li><li><a href="../cities/kotakinabalu.html">コタキナバル</a></li><li><a href="../cities/langkawi.html">ランカウイ島</a></li><li><a href="../cities/luangprabang.html">ルアンパバーン</a></li><li><a href="../cities/phnompenh.html">プノンペン</a></li><li><a href="../cities/beijing.html">北京</a></li><li><a href="../cities/chengdu.html">成都</a></li><li><a href="../cities/xian.html">西安</a></li><li><a href="../cities/guangzhou.html">広州</a></li><li><a href="../cities/kaohsiung.html">高雄</a></li><li><a href="../cities/tainan.html">台南</a></li><li><a href="../cities/macau.html">マカオ</a></li><li><a href="../cities/maldives.html">モルディブ</a></li><li><a href="../cities/delhi.html">デリー</a></li><li><a href="../cities/kathmandu.html">カトマンズ</a></li></ul></div><div class="cl-group"><h3>ハワイ・グアム・オセアニア</h3><ul><li><a href="../cities/guam.html">グアム</a></li><li><a href="../cities/honolulu.html">ホノルル</a></li><li><a href="../cities/sydney.html">シドニー</a></li><li><a href="../cities/cairns.html">ケアンズ</a></li><li><a href="../cities/melbourne.html">メルボルン</a></li><li><a href="../cities/auckland.html">オークランド</a></li><li><a href="../cities/goldcoast.html">ゴールドコースト</a></li><li><a href="../cities/perth.html">パース</a></li><li><a href="../cities/queenstown.html">クイーンズタウン</a></li><li><a href="../cities/saipan.html">サイパン</a></li><li><a href="../cities/palau.html">パラオ</a></li><li><a href="../cities/tahiti.html">タヒチ</a></li><li><a href="../cities/maui.html">マウイ島</a></li></ul></div><div class="cl-group"><h3>北米</h3><ul><li><a href="../cities/newyork.html">ニューヨーク</a></li><li><a href="../cities/la.html">ロサンゼルス</a></li><li><a href="../cities/vancouver.html">バンクーバー</a></li><li><a href="../cities/sanfrancisco.html">サンフランシスコ</a></li><li><a href="../cities/lasvegas.html">ラスベガス</a></li><li><a href="../cities/seattle.html" aria-current="page">シアトル</a></li><li><a href="../cities/chicago.html">シカゴ</a></li><li><a href="../cities/boston.html">ボストン</a></li><li><a href="../cities/washingtondc.html">ワシントンDC</a></li><li><a href="../cities/sandiego.html">サンディエゴ</a></li><li><a href="../cities/orlando.html">オーランド</a></li><li><a href="../cities/toronto.html">トロント</a></li><li><a href="../cities/banff.html">バンフ（カルガリー）</a></li></ul></div><div class="cl-group"><h3>ヨーロッパ・中東</h3><ul><li><a href="../cities/london.html">ロンドン</a></li><li><a href="../cities/paris.html">パリ</a></li><li><a href="../cities/rome.html">ローマ</a></li><li><a href="../cities/barcelona.html">バルセロナ</a></li><li><a href="../cities/amsterdam.html">アムステルダム</a></li><li><a href="../cities/prague.html">プラハ</a></li><li><a href="../cities/helsinki.html">ヘルシンキ</a></li><li><a href="../cities/istanbul.html">イスタンブール</a></li><li><a href="../cities/dubai.html">ドバイ</a></li><li><a href="../cities/lisbon.html">リスボン</a></li><li><a href="../cities/madrid.html">マドリード</a></li><li><a href="../cities/berlin.html">ベルリン</a></li><li><a href="../cities/munich.html">ミュンヘン</a></li><li><a href="../cities/vienna.html">ウィーン</a></li><li><a href="../cities/budapest.html">ブダペスト</a></li><li><a href="../cities/brussels.html">ブリュッセル</a></li><li><a href="../cities/zurich.html">チューリッヒ</a></li><li><a href="../cities/milan.html">ミラノ</a></li><li><a href="../cities/florence.html">フィレンツェ</a></li><li><a href="../cities/venice.html">ヴェネツィア</a></li><li><a href="../cities/athens.html">アテネ</a></li><li><a href="../cities/santorini.html">サントリーニ島</a></li><li><a href="../cities/copenhagen.html">コペンハーゲン</a></li><li><a href="../cities/stockholm.html">ストックホルム</a></li><li><a href="../cities/oslo.html">オスロ</a></li><li><a href="../cities/dublin.html">ダブリン</a></li><li><a href="../cities/edinburgh.html">エディンバラ</a></li><li><a href="../cities/reykjavik.html">レイキャビク</a></li><li><a href="../cities/dubrovnik.html">ドブロブニク</a></li><li><a href="../cities/krakow.html">クラクフ</a></li><li><a href="../cities/abudhabi.html">アブダビ</a></li><li><a href="../cities/doha.html">ドーハ</a></li></ul></div><div class="cl-group"><h3>中南米</h3><ul><li><a href="../cities/cancun.html">カンクン</a></li><li><a href="../cities/mexicocity.html">メキシコシティ</a></li><li><a href="../cities/lima.html">リマ（マチュピチュ）</a></li><li><a href="../cities/rio.html">リオデジャネイロ</a></li><li><a href="../cities/buenosaires.html">ブエノスアイレス</a></li></ul></div><div class="cl-group"><h3>アフリカ</h3><ul><li><a href="../cities/cairo.html">カイロ</a></li><li><a href="../cities/marrakech.html">マラケシュ</a></li><li><a href="../cities/capetown.html">ケープタウン</a></li></ul></div></div>
+  </nav>
+
+  <footer class="glass">
+    <p>航空券の目安は、比較サイトの公開情報などを参考にした当サイト独自の概算です。実際の料金は空席状況や為替で毎日変わるため、予約前に必ず各社のサイトで確認してください。宿泊・食費などは一般的な相場（1米ドル≒150円前後）による目安で、パスポート取得費用は含みません。</p>
+    <p id="affNote" hidden>当サイトはアフィリエイトプログラムを利用しており、「PR」と表示したリンクから予約・購入されると当サイトに報酬が支払われることがあります。</p>
+    <p>情報の最終更新：2026年10月26日</p>
+    <nav aria-label="サイト情報">
+      <a href="../index.html">トップ</a>
+      <a href="../find.html">予算から行き先を探す</a>
+      <a href="../plan.html">旅のしおりを作る</a>
+      <a href="../map.html">旅の世界地図</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../disclaimer.html">免責事項・運営者情報</a>
+      <a href="../contact.html">お問い合わせ</a>
+    </nav>
+  </footer>
+</div>
+<script src="../assets/data.js"></script>
+<script src="../assets/entry.js"></script>
+<script src="../assets/affiliates.js"></script>
+<script src="../assets/scenes.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
